@@ -1,0 +1,1496 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generador de tablitas de Pozito</title>
+  <style>
+    :root {
+      --ink: #172033;
+      --muted: #637083;
+      --line: #d9e0ec;
+      --soft: #f4f7fb;
+      --paper: #ffffff;
+      --black: #101724;
+      --red: #d33f3f;
+      --yellow: #ffd84a;
+      --teal: #0f8f73;
+      --shadow: 0 18px 42px rgba(23, 32, 51, .11);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 12% 0%, rgba(15, 143, 115, .12), transparent 34vw),
+        radial-gradient(circle at 94% 12%, rgba(211, 63, 63, .12), transparent 28vw),
+        linear-gradient(#e7ecf4 1px, transparent 1px) 0 0 / 72px 34px,
+        linear-gradient(90deg, #e7ecf4 1px, transparent 1px) 0 0 / 72px 34px,
+        #f8fafc;
+    }
+
+    button, select, input { font: inherit; color: inherit; }
+
+    .app {
+      width: min(1720px, 100%);
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+      grid-template-rows: auto 1fr;
+    }
+
+    .toolbar,
+    .sheet-panel,
+    .deck-panel {
+      background: rgba(255, 255, 255, .96);
+      border: 1px solid rgba(217, 224, 236, .95);
+      box-shadow: var(--shadow);
+    }
+
+    .toolbar {
+      border-radius: 16px;
+      padding: 12px;
+      display: grid;
+      grid-template-columns: 132px 132px minmax(180px, 1fr) 146px 118px 108px 118px 118px 146px;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .brand {
+      align-self: center;
+      display: grid;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .brand strong {
+      font-size: 1.28rem;
+      line-height: 1;
+    }
+
+    .brand span {
+      color: var(--muted);
+      font-size: .8rem;
+      line-height: 1.15;
+      font-weight: 650;
+    }
+
+    .field {
+      display: grid;
+      gap: 5px;
+      min-width: 0;
+    }
+
+    .field span,
+    .panel-title {
+      color: var(--muted);
+      font-size: .73rem;
+      font-weight: 900;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .show-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .check-pill {
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--paper);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 0 8px;
+      font-size: .74rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .check-pill input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--teal);
+      flex: 0 0 auto;
+    }
+
+    select,
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--paper);
+      padding: 0 10px;
+      font-weight: 800;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .center-picker {
+      position: relative;
+      min-width: 0;
+    }
+
+    .center-trigger {
+      width: 100%;
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--paper);
+      padding: 4px 34px 4px 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      font-weight: 850;
+    }
+
+    .center-trigger::after {
+      content: "";
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid var(--muted);
+      border-bottom: 2px solid var(--muted);
+      transform: translateY(-65%) rotate(45deg);
+    }
+
+    .center-trigger .mini-card {
+      width: 30px;
+      border-width: 1px;
+      border-radius: 4px;
+      font-size: .48rem;
+    }
+
+    .center-picker[open] .center-trigger::after {
+      transform: translateY(-35%) rotate(225deg);
+    }
+
+    .center-menu {
+      position: absolute;
+      z-index: 20;
+      top: calc(100% + 6px);
+      left: 0;
+      width: min(520px, calc(100vw - 28px));
+      max-height: min(560px, calc(100vh - 120px));
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, .98);
+      box-shadow: var(--shadow);
+      overflow: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      display: none;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .center-picker[open] .center-menu {
+      display: grid;
+    }
+
+    .center-option {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0;
+      aspect-ratio: 3 / 4;
+      background: #f8fafc;
+      cursor: pointer;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .center-option:first-child {
+      aspect-ratio: auto;
+      min-height: 42px;
+      grid-column: 1 / -1;
+      display: grid;
+      place-items: center;
+      padding: 0 12px;
+      font-weight: 900;
+      color: var(--muted);
+    }
+
+    .center-option.is-selected {
+      outline: 4px solid var(--yellow);
+      outline-offset: -4px;
+    }
+
+    .center-option img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    input[type="number"] { appearance: textfield; }
+
+    input[type="color"] {
+      width: 100%;
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--paper);
+      padding: 4px;
+      cursor: pointer;
+    }
+
+    .btn {
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--paper);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 0 12px;
+      font-weight: 900;
+      box-shadow: 0 2px 0 rgba(23, 32, 51, .04);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      border-color: #aeb8c9;
+    }
+
+    .btn.primary {
+      background: var(--black);
+      border-color: var(--black);
+      color: white;
+    }
+
+    .main {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) clamp(290px, 23vw, 370px);
+      gap: 12px;
+      align-items: start;
+    }
+
+    .sheet-panel {
+      border-radius: 18px;
+      padding: 12px;
+      overflow: auto;
+    }
+
+    .sheet {
+      --cols: 4;
+      --rows: 3;
+      --side-width: 230px;
+      --sheet-side-width: var(--side-width);
+      --board-gap: 8px;
+      --sheet-bg: #101828;
+      --panel-bg: var(--sheet-bg);
+      width: 100%;
+      min-width: 760px;
+      aspect-ratio: 1170 / 972;
+      background: var(--sheet-bg);
+      border: 6px solid var(--sheet-bg);
+      display: grid;
+      grid-template-columns: var(--sheet-side-width) 1fr;
+      gap: 8px;
+      padding: 8px;
+    }
+
+    .sheet.no-side {
+      --sheet-side-width: 0px;
+      grid-template-columns: 1fr;
+    }
+
+    .sheet.no-side .side {
+      display: none;
+    }
+
+    .side {
+      background: var(--panel-bg);
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      gap: 10px;
+      padding: 10px;
+      align-content: start;
+      min-height: 0;
+    }
+
+    .side.hide-center.hide-prefs { grid-template-rows: auto; }
+    .side.hide-center:not(.hide-prefs) { grid-template-rows: auto minmax(0, 1fr); }
+    .side:not(.hide-center).hide-prefs { grid-template-rows: auto auto; }
+
+    .count-panel {
+      display: grid;
+      place-items: center;
+      align-content: center;
+      gap: 2px;
+      text-align: center;
+      padding: 12px 6px;
+      background: var(--sheet-bg);
+      color: white;
+      border-radius: 8px;
+    }
+
+    .count-panel strong {
+      font-size: clamp(2.1rem, 4vw, 3.5rem);
+      line-height: .88;
+    }
+
+    .count-panel span {
+      font-size: .9rem;
+      font-weight: 950;
+      text-transform: uppercase;
+    }
+
+    .side-box {
+      background: var(--panel-bg);
+      border: 1px solid #edf1f7;
+      border-radius: 8px;
+      padding: 8px;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      gap: 7px;
+      justify-items: center;
+      align-content: start;
+      min-height: 0;
+    }
+
+    .side-box[hidden] { display: none !important; }
+
+    .side-list {
+      --pref-size: 120px;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 12px;
+      justify-items: center;
+      align-content: stretch;
+      align-items: center;
+    }
+
+    .side-list .mini-card {
+      width: min(var(--pref-size), 100%);
+      max-height: 100%;
+    }
+
+    .cell,
+    .card-tile {
+      overflow: hidden;
+      background: white;
+    }
+
+    .mini-card {
+      overflow: hidden;
+      background: var(--panel-bg);
+      width: min(104px, 100%);
+      aspect-ratio: 3 / 4;
+      border-radius: 6px;
+      border: 2px solid var(--line);
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      font-size: .68rem;
+      font-weight: 800;
+      text-align: center;
+      line-height: 1.05;
+    }
+
+    .mini-card.center-mark { border-color: var(--yellow); }
+    .mini-card.pref-mark { border-color: var(--red); }
+
+    body[data-card-shape="circle"] .mini-card {
+      aspect-ratio: 3 / 4;
+      border-radius: 6px;
+    }
+
+    .boards {
+      display: grid;
+      grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+      grid-template-rows: repeat(var(--rows), minmax(0, 1fr));
+      gap: var(--board-gap);
+      align-content: center;
+    }
+
+    body[data-card-shape="circle"] .boards {
+      background: #fff;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-rows: repeat(4, minmax(0, 1fr));
+      gap: 2px;
+      aspect-ratio: 3 / 4;
+      background: var(--sheet-bg);
+      border: 2px solid var(--sheet-bg);
+      min-width: 0;
+    }
+
+    .cell {
+      position: relative;
+      min-width: 0;
+      min-height: 0;
+    }
+
+    .cell.center::after,
+    .cell.preferred::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      box-shadow: inset 0 0 0 3px var(--mark);
+    }
+
+    .cell.center { --mark: var(--yellow); }
+    .cell.preferred { --mark: var(--red); }
+
+    body[data-card-shape="circle"] .cell {
+      display: grid;
+      place-items: center;
+      background: transparent;
+      overflow: visible;
+    }
+
+    body[data-card-shape="circle"] .cell.center::after,
+    body[data-card-shape="circle"] .cell.preferred::after {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      inset: auto;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+    }
+
+    .cell img,
+    .mini-card img,
+    .card-tile img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .deck-panel {
+      position: sticky;
+      top: 12px;
+      border-radius: 18px;
+      height: calc(100dvh - 28px);
+      max-height: calc(100dvh - 28px);
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto auto auto minmax(0, 1fr);
+      min-height: 0;
+    }
+
+    .deck-panel[open] { display: grid; }
+
+    .deck-panel:not([open]) {
+      display: block;
+    }
+
+    .deck-head,
+    .deck-tools,
+    .status {
+      padding: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .deck-head {
+      display: grid;
+      gap: 4px;
+      cursor: pointer;
+      list-style: none;
+    }
+
+    .deck-head::-webkit-details-marker { display: none; }
+
+    .deck-head strong {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .deck-head strong::after {
+      content: "Cerrar";
+      font-size: .75rem;
+      color: var(--muted);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .deck-panel:not([open]) .deck-head strong::after {
+      content: "Abrir";
+    }
+
+    .deck-head strong { font-size: 1.04rem; }
+    .deck-head span { color: var(--muted); font-size: .82rem; font-weight: 700; }
+
+    .deck-tools {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .toggle {
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: #fff;
+      padding: 0 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      cursor: pointer;
+      font-weight: 850;
+      font-size: .85rem;
+      text-align: center;
+    }
+
+    .toggle input {
+      width: 15px;
+      height: 15px;
+      accent-color: var(--teal);
+    }
+
+    .status {
+      display: grid;
+      gap: 5px;
+      color: var(--muted);
+      font-size: .82rem;
+      font-weight: 700;
+    }
+
+    .status strong { color: var(--ink); }
+
+    .cards {
+      height: calc(100dvh - 218px);
+      max-height: calc(100dvh - 218px);
+      padding: 10px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-auto-rows: max-content;
+      gap: 8px;
+      overflow-x: hidden;
+      overflow-y: scroll;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      align-content: start;
+      align-items: start;
+      min-height: 0;
+      padding-bottom: 18px;
+    }
+
+    .card-tile {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0;
+      cursor: pointer;
+      aspect-ratio: 3 / 4;
+      width: 100%;
+      height: auto;
+      position: relative;
+      background: #f8fafc;
+    }
+
+    body[data-card-shape="circle"] .card-tile {
+      aspect-ratio: 1 / 1;
+      border-radius: 50%;
+    }
+
+    body[data-card-shape="circle"] .center-option:not(:first-child) {
+      aspect-ratio: 1 / 1;
+      border-radius: 50%;
+    }
+
+    body[data-card-shape="circle"] .cell img {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1 / 1;
+      border-radius: 50%;
+      object-fit: cover;
+      object-position: center 26%;
+    }
+
+    body[data-card-shape="circle"] .mini-card img {
+      width: 100%;
+      height: 100%;
+      aspect-ratio: auto;
+      border-radius: 0;
+      object-fit: contain;
+      object-position: center;
+    }
+
+    body[data-card-shape="circle"] .card-tile img {
+      width: 100%;
+      height: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 50%;
+      object-fit: contain;
+      object-position: center 26%;
+    }
+
+    .card-tile:hover { border-color: #aeb8c9; }
+
+    .card-tile.is-center { outline: 4px solid var(--yellow); outline-offset: -4px; }
+    .card-tile.is-pref { outline: 4px solid var(--red); outline-offset: -4px; }
+
+    .card-tile img { object-fit: contain; }
+
+    .toast {
+      min-height: 20px;
+      color: #b43333;
+      font-size: .82rem;
+      font-weight: 850;
+    }
+
+    @media (max-width: 1180px) {
+      .toolbar { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .brand { grid-column: 1 / -1; }
+      .main { grid-template-columns: 1fr; }
+      .deck-panel { position: static; height: min(68dvh, 520px); max-height: min(68dvh, 520px); }
+      .cards { height: calc(min(68dvh, 520px) - 160px); max-height: calc(min(68dvh, 520px) - 160px); }
+      .sheet { min-width: 720px; }
+      .center-menu { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 680px) {
+      .app { padding: 10px; }
+      .toolbar { grid-template-columns: 1fr 1fr; }
+      .field.wide, .brand { grid-column: 1 / -1; }
+      .btn { padding: 0 8px; }
+      .sheet-panel { padding: 8px; }
+      .sheet { min-width: 680px; --side-width: 180px; }
+      .cards { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .center-menu { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    }
+
+    @page { size: landscape; margin: .25in; }
+
+    @media print {
+      body { background: white; }
+      .toolbar, .deck-panel { display: none !important; }
+      .app { width: 100%; min-height: 0; padding: 0; display: block; }
+      .main { display: block; }
+      .sheet-panel { box-shadow: none; border: 0; border-radius: 0; padding: 0; overflow: visible; }
+      .sheet {
+        width: 100%;
+        min-width: 0;
+        height: calc(100vh - .5in);
+        border-width: 5px;
+        break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="toolbar" aria-label="Controles">
+      <label class="field" for="deckSelect">
+        <span>Baraja</span>
+        <select id="deckSelect"></select>
+      </label>
+
+      <label class="field" for="boardCount">
+        <span>Tablas</span>
+        <input id="boardCount" type="number" min="1" max="30" value="12">
+      </label>
+
+      <div class="field wide">
+        <span>Centro opcional</span>
+        <select class="visually-hidden" id="centerSelect" tabindex="-1" aria-hidden="true"></select>
+        <div class="center-picker" id="centerPicker">
+          <button class="center-trigger" id="centerTrigger" type="button" aria-haspopup="listbox" aria-expanded="false"></button>
+          <div class="center-menu" id="centerMenu" role="listbox" aria-label="Centro opcional"></div>
+        </div>
+      </div>
+
+      <div class="field">
+        <span>Mostrar</span>
+        <div class="show-options">
+          <label class="check-pill">
+            <input id="showCenterPanel" type="checkbox" checked>
+            Centro
+          </label>
+          <label class="check-pill">
+            <input id="showPrefsPanel" type="checkbox" checked>
+            Prefs
+          </label>
+        </div>
+      </div>
+
+      <label class="field" for="cardShape">
+        <span>Forma</span>
+        <select id="cardShape">
+          <option value="rectangle">Rectangulo</option>
+          <option value="circle">Circular</option>
+        </select>
+      </label>
+
+      <label class="field" for="sheetColor">
+        <span>Fondo</span>
+        <input id="sheetColor" type="color" value="#101828">
+      </label>
+
+      <button class="btn" id="clearBtn" type="button">Limpiar</button>
+      <button class="btn" id="shuffleBtn" type="button">Mezclar</button>
+      <button class="btn" id="generateBtn" type="button">Generar</button>
+      <button class="btn primary" id="downloadBtn" type="button">Descargar PNG</button>
+    </section>
+
+    <section class="main">
+      <div class="sheet-panel">
+        <div class="sheet" id="sheet">
+          <aside class="side" id="sidePanel">
+            <div class="count-panel">
+              <strong id="countBadge">12</strong>
+              <span>tablas</span>
+            </div>
+
+            <div class="side-box" id="centerBox">
+              <div class="panel-title">Centro</div>
+              <div id="centerMini" class="mini-card">Sin centro</div>
+            </div>
+
+            <div class="side-box" id="prefsBox">
+              <div class="panel-title">Preferidas</div>
+              <div class="side-list" id="prefMini"></div>
+            </div>
+
+          </aside>
+          <section class="boards" id="boards"></section>
+        </div>
+      </div>
+
+      <details class="deck-panel" open>
+        <summary class="deck-head">
+          <strong>Cartas de la baraja</strong>
+          <span>Click: agrega o quita preferida. Usa el selector de centro para fijar una carta.</span>
+        </summary>
+
+        <div class="deck-tools">
+          <label class="toggle">
+            <input id="repeatPrefs" type="checkbox" checked>
+            Repetir en todas
+          </label>
+          <label class="toggle">
+            <input id="forceAll" type="checkbox" checked>
+            Repartir todo el mazo
+          </label>
+        </div>
+
+        <div class="status">
+          <div>Centro: <strong id="centerStatus">Sin centro</strong></div>
+          <div>Preferidas: <strong id="prefStatus">0 de 4</strong></div>
+          <div class="toast" id="toast"></div>
+        </div>
+
+        <div class="cards" id="cards"></div>
+      </details>
+    </section>
+  </main>
+
+  <script>
+    const FIGURAS = [
+      { id: 1, n: "El Gallo" }, { id: 2, n: "El Diablo" }, { id: 3, n: "La Dama" },
+      { id: 4, n: "El Catrin" }, { id: 5, n: "El Paraguas" }, { id: 6, n: "La Sirena" },
+      { id: 7, n: "La Escalera" }, { id: 8, n: "La Botella" }, { id: 9, n: "El Barril" },
+      { id: 10, n: "El Arbol" }, { id: 11, n: "El Melon" }, { id: 12, n: "El Valiente" },
+      { id: 13, n: "El Gorrito" }, { id: 14, n: "La Muerte" }, { id: 15, n: "La Pera" },
+      { id: 16, n: "La Bandera" }, { id: 17, n: "El Bandolon" }, { id: 18, n: "El Violoncello" },
+      { id: 19, n: "La Garza" }, { id: 20, n: "El Pajaro" }, { id: 21, n: "La Mano" },
+      { id: 22, n: "La Bota" }, { id: 23, n: "La Luna" }, { id: 24, n: "El Cotorro" },
+      { id: 25, n: "El Borracho" }, { id: 26, n: "El Negrito" }, { id: 27, n: "El Corazon" },
+      { id: 28, n: "La Sandia" }, { id: 29, n: "El Tambor" }, { id: 30, n: "El Camaron" },
+      { id: 31, n: "Las Jaras" }, { id: 32, n: "El Musico" }, { id: 33, n: "La Arana" },
+      { id: 34, n: "El Soldado" }, { id: 35, n: "La Estrella" }, { id: 36, n: "El Cazo" },
+      { id: 37, n: "El Mundo" }, { id: 38, n: "El Apache" }, { id: 39, n: "El Nopal" },
+      { id: 40, n: "El Alacran" }, { id: 41, n: "La Rosa" }, { id: 42, n: "La Calavera" },
+      { id: 43, n: "La Campana" }, { id: 44, n: "El Cantarito" }, { id: 45, n: "El Venado" },
+      { id: 46, n: "El Sol" }, { id: 47, n: "La Corona" }, { id: 48, n: "La Chalupa" },
+      { id: 49, n: "El Angel" }, { id: 50, n: "La Maceta" }, { id: 51, n: "El Arpa" },
+      { id: 52, n: "La Rana" }, { id: 53, n: "El Copal" }, { id: 54, n: "La Palma" }
+    ];
+
+    const DECKS = [
+      { id: "clasico", label: "Clasica", type: "classic" },
+      { id: "nino", label: "Baraja Nino", type: "numbered", folder: "Baraja Niño", ext: "jpeg" },
+      { id: "animada", label: "Animada original", type: "whatsapp", folder: "baraja animada", date: "2026-04-28", specs: [["17.42.07",1,1],["17.42.08",0,1],["17.42.09",1,1],["17.42.10",0,1],["17.42.11",0,1],["17.42.12",0,1],["17.42.13",1,1],["17.42.14",0,1],["17.42.15",0,1],["17.42.16",0,1],["17.42.17",0,1],["17.42.18",0,1],["17.42.20",0,1],["17.42.21",1,1],["17.42.23",0,1],["17.42.24",0,1],["17.42.25",0,1],["17.42.26",0,1],["17.42.27",0,1],["17.42.28",0,1],["17.42.29",0,1],["17.42.30",0,1],["17.42.31",0,1],["17.42.32",0,1],["17.42.33",0,1],["17.42.34",0,1],["17.42.35",0,1],["17.42.36",0,1],["17.42.37",0,1],["17.42.38",1,1],["17.42.40",1,1],["17.42.41",0,1],["17.42.42",0,1],["17.42.43",0,1],["17.42.44",0,1],["17.42.45",1,1],["17.42.46",0,1],["17.42.47",0,1],["17.42.48",0,1],["17.42.49",0,1],["17.42.50",0,1],["17.42.51",1,1],["17.42.52",0,1],["17.42.53",0,1],["17.42.54",1,1]] },
+      { id: "animada2", label: "Animada 2", type: "whatsapp", folder: "Baraja Animada 2", date: "2026-05-04", specs: [["14.31.22",1,1],["14.31.23",4,1],["14.31.24",4,1],["14.31.25",4,1],["14.31.26",3,1],["14.31.27",3,1],["14.31.28",4,1],["14.31.29",4,1],["14.31.30",6,1],["14.31.31",4,1],["14.31.32",2,1],["14.31.33",3,1]] },
+      { id: "animado3", label: "Animado 3", type: "whatsapp", folder: "Animado 3", date: "2026-05-04", specs: [["14.59.45",1,1],["14.59.46",1,1],["14.59.47",5,1],["14.59.48",4,1],["14.59.49",4,1],["14.59.50",4,1],["14.59.51",4,1],["14.59.52",4,1],["14.59.53",3,1],["14.59.54",0,1],["14.59.55",4,1],["14.59.56",4,1],["14.59.57",3,1]] },
+      { id: "colores", label: "Colores bonitos", type: "whatsapp", folder: "Animada colores bonitos", date: "2026-05-04", specs: [["15.39.38",4,1],["15.39.39",10,1],["15.39.40",12,1],["15.39.41",12,1],["15.39.42",11,1]] },
+      { id: "brillos", label: "Colores brillos", type: "whatsapp", folder: "Colores bonitos brillos", date: "2026-05-04", specs: [["15.00.19",0,1],["15.00.20",0,1],["15.00.21",2,1],["15.00.22",0,1],["15.00.23",0,1],["15.00.24",3,1],["15.00.25",4,1],["15.00.26",5,1],["15.00.27",4,1],["15.00.28",4,1],["15.00.29",4,1],["15.00.30",4,1],["15.00.31",4,1],["15.00.32",4,1],["15.00.33",1,1]] },
+      { id: "neon", label: "Neon", type: "whatsapp", folder: "Baraja tipo Neon", date: "2026-05-04", specs: [["14.31.11",0,1],["14.31.12",4,1],["14.31.13",4,1],["14.31.14",4,1],["14.31.15",4,1],["14.31.16",5,1],["14.31.17",4,1],["14.31.18",4,1],["14.31.19",4,1],["14.31.20",4,1],["14.31.21",4,1],["14.31.22",1,1]] },
+      { id: "rosas", label: "Brillos rosas", type: "whatsapp", folder: "Baraja brillos rosas", date: "2026-05-04", specs: [["15.36.50",4,1],["15.36.51",8,1],["15.36.52",3,1],["15.36.54",0,1],["15.36.57",6,1],["15.36.58",8,1],["15.37.00",2,1],["15.37.01",8,1],["15.37.02",6,1]] },
+      { id: "trebol", label: "Trebol", type: "whatsapp", folder: "Baraja trebol", date: "2026-05-04", specs: [["14.30.42",4,1],["14.30.43",2,1],["14.30.44",2,1],["14.30.45",1,1],["14.30.46",1,1],["14.30.47",0,1],["14.30.48",2,1],["14.30.49",1,1],["14.30.50",2,1],["14.30.51",1,1],["14.30.52",1,1],["14.30.53",1,1],["14.30.54",1,1],["14.30.55",4,1],["14.30.56",4,1],["14.30.57",4,1],["14.30.58",4,1],["14.30.59",1,1]] },
+      { id: "galaxy", label: "Galaxy", type: "whatsapp", folder: "Galaxyy", date: "2026-05-04", specs: [["16.36.19",9,1],["16.36.20",11,1],["16.36.21",10,1],["16.36.22",12,1],["16.36.23",7,1]] }
+    ];
+
+    const CARD_COUNT = 16;
+    const CENTER_POS = 5;
+    const PREF_POSITIONS = [0, 3, 12, 15];
+
+    const state = {
+      deck: "clasico",
+      boardCount: 12,
+      center: null,
+      prefs: [],
+      repeatPrefs: true,
+      forceAll: true,
+      showCenterPanel: true,
+      showPrefsPanel: true,
+      sheetColor: "#101828",
+      cardShape: "rectangle",
+      boards: []
+    };
+
+    const $ = selector => document.querySelector(selector);
+
+    function classicPath(id) {
+      return id <= 15
+        ? `carpeta sin titulo/Imagen ${id}.png`
+        : `carpeta sin titulo/${id}.png`;
+    }
+
+    function deckById(id) {
+      return DECKS.find(deck => deck.id === id) || DECKS[0];
+    }
+
+    function whatsAppFiles(deck) {
+      if (deck.files) return deck.files;
+      deck.files = deck.specs.flatMap(([time, copies, hasPlain]) => {
+        const files = [];
+        for (let index = 1; index <= copies; index++) {
+          files.push(`WhatsApp Image ${deck.date} at ${time} (${index}).jpeg`);
+        }
+        if (hasPlain) files.push(`WhatsApp Image ${deck.date} at ${time}.jpeg`);
+        return files;
+      });
+      return deck.files;
+    }
+
+    function imageFor(id) {
+      const deck = deckById(state.deck);
+      if (deck.type === "classic") return classicPath(id);
+      if (deck.type === "numbered") return `${deck.folder}/${id}.${deck.ext}`;
+      if (deck.type === "whatsapp") {
+        const file = whatsAppFiles(deck)[id - 1];
+        return file ? `${deck.folder}/${encodeURIComponent(file)}` : classicPath(id);
+      }
+      return classicPath(id);
+    }
+
+    function figure(id) {
+      return FIGURAS.find(item => item.id === Number(id));
+    }
+
+    function shuffle(items, random) {
+      const arr = [...items];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function clampBoards(value) {
+      return Math.max(1, Math.min(30, Number(value) || 1));
+    }
+
+    function boardGrid() {
+      const count = state.boardCount;
+      if (count <= 1) return { cols: 1, rows: 1 };
+      if (count <= 4) return { cols: 2, rows: 2 };
+      if (count <= 6) return { cols: 3, rows: 2 };
+      if (count <= 9) return { cols: 3, rows: 3 };
+      if (count <= 12) return { cols: 4, rows: 3 };
+      if (count <= 16) return { cols: 4, rows: 4 };
+      if (count <= 20) return { cols: 5, rows: 4 };
+      if (count <= 25) return { cols: 5, rows: 5 };
+      return { cols: 6, rows: 5 };
+    }
+
+    function showToast(message) {
+      $("#toast").textContent = message || "";
+    }
+
+    function safeText(text) {
+      return String(text).replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "\"": "&quot;",
+        "'": "&#039;"
+      })[char]);
+    }
+
+    function fallbackText(id) {
+      const fig = figure(id);
+      return fig ? `${fig.id}. ${fig.n}` : "";
+    }
+
+    function imageHTML(id) {
+      const fig = figure(id);
+      if (!fig) return "";
+      const fallback = safeText(fallbackText(id));
+      return `<img src="${imageFor(id)}" alt="${safeText(fig.n)}" onerror="this.replaceWith(document.createTextNode('${fallback}'))">`;
+    }
+
+    function preferredPlacementsForBoard(boardIndex) {
+      if (!state.prefs.length) return null;
+      if (state.repeatPrefs) {
+        return state.prefs.map((id, index) => ({
+          id,
+          pos: PREF_POSITIONS[index]
+        }));
+      }
+
+      return [{
+        id: state.prefs[boardIndex % state.prefs.length],
+        pos: PREF_POSITIONS[boardIndex % PREF_POSITIONS.length]
+      }];
+    }
+
+    function buildBoards() {
+      const random = Math.random;
+      const ids = FIGURAS.map(fig => fig.id);
+      const boards = [];
+      const globalCounts = new Map(ids.map(id => [id, 0]));
+
+      for (let boardIndex = 0; boardIndex < state.boardCount; boardIndex++) {
+        const slots = new Array(CARD_COUNT).fill(null);
+        const used = new Set();
+        const preferredPlacements = preferredPlacementsForBoard(boardIndex) || [];
+
+        if (state.center) {
+          slots[CENTER_POS] = state.center;
+          used.add(state.center);
+          globalCounts.set(state.center, globalCounts.get(state.center) + 1);
+        }
+
+        preferredPlacements.forEach(({ id, pos }) => {
+          if (!id || id === state.center || slots[pos]) return;
+          slots[pos] = id;
+          used.add(id);
+          globalCounts.set(id, globalCounts.get(id) + 1);
+        });
+
+        const available = ids.filter(id => !used.has(id));
+        const ordered = state.forceAll
+          ? shuffle(available, random).sort((a, b) => globalCounts.get(a) - globalCounts.get(b) || random() - .5)
+          : shuffle(available, random);
+
+        for (let pos = 0; pos < CARD_COUNT; pos++) {
+          if (slots[pos]) continue;
+          const card = ordered.shift();
+          slots[pos] = card;
+          used.add(card);
+          globalCounts.set(card, globalCounts.get(card) + 1);
+        }
+
+        boards.push(slots);
+      }
+
+      state.boards = boards;
+    }
+
+    function renderCenterSelect() {
+      $("#centerSelect").innerHTML = [
+        `<option value="">Sin centro</option>`,
+        ...FIGURAS.map(fig => `<option value="${fig.id}">${fig.id}. ${safeText(fig.n)}</option>`)
+      ].join("");
+      $("#centerSelect").value = state.center || "";
+      renderCenterPicker();
+    }
+
+    function renderDeckSelect() {
+      $("#deckSelect").innerHTML = DECKS.map(deck => (
+        `<option value="${deck.id}">${safeText(deck.label)}</option>`
+      )).join("");
+      $("#deckSelect").value = state.deck;
+    }
+
+    function renderCards() {
+      const prefSet = new Set(state.prefs);
+      $("#cards").innerHTML = FIGURAS.map(fig => {
+        const classes = [
+          "card-tile",
+          state.center === fig.id ? "is-center" : "",
+          prefSet.has(fig.id) ? "is-pref" : ""
+        ].filter(Boolean).join(" ");
+        return `
+          <button class="${classes}" type="button" data-card="${fig.id}" aria-label="${safeText(fig.n)}">
+            ${imageHTML(fig.id)}
+          </button>
+        `;
+      }).join("");
+
+      document.querySelectorAll("[data-card]").forEach(button => {
+        button.addEventListener("click", () => togglePreferred(Number(button.dataset.card)));
+      });
+    }
+
+    function renderCenterPicker() {
+      $("#centerSelect").value = state.center || "";
+      $("#centerTrigger").innerHTML = state.center
+        ? renderMiniCard(state.center, "center-mark", "")
+        : `<span>Sin centro</span>`;
+
+      $("#centerMenu").innerHTML = [
+        `<button class="center-option${state.center ? "" : " is-selected"}" type="button" data-center="" role="option" aria-selected="${state.center ? "false" : "true"}">Sin centro</button>`,
+        ...FIGURAS.map(fig => {
+          const selected = state.center === fig.id;
+          return `
+            <button class="center-option${selected ? " is-selected" : ""}" type="button" data-center="${fig.id}" role="option" aria-selected="${selected ? "true" : "false"}" aria-label="${safeText(fig.n)}">
+              ${imageHTML(fig.id)}
+            </button>
+          `;
+        })
+      ].join("");
+
+      document.querySelectorAll("[data-center]").forEach(button => {
+        button.addEventListener("click", () => selectCenter(button.dataset.center));
+      });
+    }
+
+    function setCenterPickerOpen(isOpen) {
+      $("#centerPicker").toggleAttribute("open", isOpen);
+      $("#centerTrigger").setAttribute("aria-expanded", isOpen ? "true" : "false");
+    }
+
+    function selectCenter(value) {
+      state.center = value ? Number(value) : null;
+      state.prefs = state.prefs.filter(id => id !== state.center);
+      setCenterPickerOpen(false);
+      renderAll();
+    }
+
+    function renderMiniCard(id, kind, emptyText) {
+      if (!id) return `<div class="mini-card">${emptyText}</div>`;
+      return `<div class="mini-card ${kind}">${imageHTML(id)}</div>`;
+    }
+
+    function applyTheme() {
+      $("#sheet").style.setProperty("--sheet-bg", state.sheetColor);
+      $("#sheet").style.setProperty("--panel-bg", state.sheetColor);
+      $("#sheetColor").value = state.sheetColor;
+      $("#cardShape").value = state.cardShape;
+      $("#showCenterPanel").checked = state.showCenterPanel;
+      $("#showPrefsPanel").checked = state.showPrefsPanel;
+      document.body.dataset.cardShape = state.cardShape;
+    }
+
+    function fitPreferredMiniCards() {
+      const list = $("#prefMini");
+      const count = Math.max(1, state.prefs.length);
+      const gap = 12;
+      const availableHeight = list.clientHeight || 0;
+      const availableWidth = list.clientWidth || 0;
+      const rowHeight = Math.max(0, (availableHeight - gap * (count - 1)) / count);
+      const cardWidth = Math.floor(Math.min(availableWidth, rowHeight * .75));
+      list.style.gridTemplateRows = `repeat(${count}, minmax(0, 1fr))`;
+      list.style.setProperty("--pref-size", `${Math.max(54, cardWidth)}px`);
+    }
+
+    function loadImage(src) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = src;
+      });
+    }
+
+    function relativeRect(element, base) {
+      const rect = element.getBoundingClientRect();
+      return {
+        x: rect.left - base.left,
+        y: rect.top - base.top,
+        w: rect.width,
+        h: rect.height
+      };
+    }
+
+    function roundedRectPath(context, x, y, width, height, radius) {
+      const r = Math.min(radius, width / 2, height / 2);
+      context.beginPath();
+      context.moveTo(x + r, y);
+      context.arcTo(x + width, y, x + width, y + height, r);
+      context.arcTo(x + width, y + height, x, y + height, r);
+      context.arcTo(x, y + height, x, y, r);
+      context.arcTo(x, y, x + width, y, r);
+      context.closePath();
+    }
+
+    function drawImageCover(context, img, x, y, width, height, focusY = .5) {
+      const iw = img.naturalWidth || img.width;
+      const ih = img.naturalHeight || img.height;
+      const imageRatio = iw / ih;
+      const targetRatio = width / height;
+      let sx = 0;
+      let sy = 0;
+      let sw = iw;
+      let sh = ih;
+
+      if (imageRatio > targetRatio) {
+        sw = ih * targetRatio;
+        sx = (iw - sw) / 2;
+      } else {
+        sh = iw / targetRatio;
+        sy = (ih - sh) * focusY;
+      }
+
+      context.drawImage(img, sx, sy, sw, sh, x, y, width, height);
+    }
+
+    function drawImageContain(context, img, x, y, width, height) {
+      const iw = img.naturalWidth || img.width;
+      const ih = img.naturalHeight || img.height;
+      const scale = Math.min(width / iw, height / ih);
+      const dw = iw * scale;
+      const dh = ih * scale;
+      context.drawImage(img, x + (width - dw) / 2, y + (height - dh) / 2, dw, dh);
+    }
+
+    function drawPanelBox(context, rect) {
+      roundedRectPath(context, rect.x, rect.y, rect.w, rect.h, 8);
+      context.fillStyle = state.sheetColor;
+      context.fill();
+      context.lineWidth = 1;
+      context.strokeStyle = "#edf1f7";
+      context.stroke();
+    }
+
+    function drawCenteredText(context, text, x, y, size, weight = 900, color = "#ffffff") {
+      context.fillStyle = color;
+      context.font = `${weight} ${size}px Inter, Arial, sans-serif`;
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.fillText(text, x, y);
+    }
+
+    async function imageCacheFor(ids) {
+      const uniqueIds = [...new Set(ids.filter(Boolean))];
+      const entries = await Promise.all(uniqueIds.map(async id => [id, await loadImage(imageFor(id))]));
+      return new Map(entries);
+    }
+
+    function drawMiniCard(context, img, rect, color) {
+      roundedRectPath(context, rect.x, rect.y, rect.w, rect.h, 6);
+      context.fillStyle = state.sheetColor;
+      context.fill();
+      context.save();
+      roundedRectPath(context, rect.x, rect.y, rect.w, rect.h, 6);
+      context.clip();
+      drawImageContain(context, img, rect.x, rect.y, rect.w, rect.h);
+      context.restore();
+      context.lineWidth = 2;
+      context.strokeStyle = color;
+      context.stroke();
+    }
+
+    async function downloadSheetPNG() {
+      const button = $("#downloadBtn");
+      const sheet = $("#sheet");
+      const sheetRect = sheet.getBoundingClientRect();
+      const width = Math.ceil(sheetRect.width);
+      const height = Math.ceil(sheetRect.height);
+      const scale = 2;
+      const allIds = [
+        state.center,
+        ...state.prefs,
+        ...state.boards.flat()
+      ];
+
+      button.disabled = true;
+      button.textContent = "Preparando...";
+
+      try {
+        const images = await imageCacheFor(allIds);
+        const canvas = document.createElement("canvas");
+        canvas.width = width * scale;
+        canvas.height = height * scale;
+        const context = canvas.getContext("2d");
+        context.imageSmoothingEnabled = true;
+        context.imageSmoothingQuality = "high";
+        context.scale(scale, scale);
+
+        context.fillStyle = state.sheetColor;
+        context.fillRect(0, 0, width, height);
+
+        const sideVisible = state.showCenterPanel || state.showPrefsPanel;
+        if (sideVisible) {
+          const countRect = relativeRect($(".count-panel"), sheetRect);
+          drawCenteredText(context, String(state.boardCount), countRect.x + countRect.w / 2, countRect.y + countRect.h / 2 - 11, Math.min(64, countRect.w * .38));
+          drawCenteredText(context, "TABLAS", countRect.x + countRect.w / 2, countRect.y + countRect.h / 2 + 30, 20, 950);
+
+          if (state.showCenterPanel) {
+            const box = $("#centerBox");
+            const rect = relativeRect(box, sheetRect);
+            drawPanelBox(context, rect);
+            drawCenteredText(context, "CENTRO", rect.x + rect.w / 2, rect.y + 22, 14, 900, "#7a8497");
+            if (state.center) drawMiniCard(context, images.get(state.center), relativeRect($("#centerMini"), sheetRect), "#ffd84a");
+          }
+
+          if (state.showPrefsPanel) {
+            const box = $("#prefsBox");
+            const rect = relativeRect(box, sheetRect);
+            drawPanelBox(context, rect);
+            drawCenteredText(context, "PREFERIDAS", rect.x + rect.w / 2, rect.y + 22, 14, 900, "#7a8497");
+            state.prefs.forEach((id, index) => {
+              const card = $("#prefMini").children[index];
+              if (card) drawMiniCard(context, images.get(id), relativeRect(card, sheetRect), "#d33f3f");
+            });
+          }
+        }
+
+        if (state.cardShape === "circle") {
+          const boardsRect = relativeRect($("#boards"), sheetRect);
+          context.fillStyle = "#ffffff";
+          context.fillRect(boardsRect.x, boardsRect.y, boardsRect.w, boardsRect.h);
+        }
+
+        document.querySelectorAll(".board").forEach((board, boardIndex) => {
+          const boardRect = relativeRect(board, sheetRect);
+          context.fillStyle = state.sheetColor;
+          context.fillRect(boardRect.x, boardRect.y, boardRect.w, boardRect.h);
+          const preferredIds = new Set((preferredPlacementsForBoard(boardIndex) || []).map(item => item.id));
+
+          [...board.children].forEach((cell, pos) => {
+            const id = state.boards[boardIndex][pos];
+            const img = images.get(id);
+            const rect = relativeRect(cell, sheetRect);
+            if (!img) return;
+
+            if (state.cardShape === "circle") {
+              const size = Math.min(rect.w, rect.h);
+              const x = rect.x + (rect.w - size) / 2;
+              const y = rect.y + (rect.h - size) / 2;
+              context.save();
+              context.beginPath();
+              context.arc(x + size / 2, y + size / 2, size / 2, 0, Math.PI * 2);
+              context.clip();
+              drawImageCover(context, img, x, y, size, size, .26);
+              context.restore();
+              if ((state.center && pos === CENTER_POS && id === state.center) || preferredIds.has(id)) {
+                context.lineWidth = 4;
+                context.strokeStyle = preferredIds.has(id) ? "#d33f3f" : "#ffd84a";
+                context.beginPath();
+                context.arc(x + size / 2, y + size / 2, size / 2 - 2, 0, Math.PI * 2);
+                context.stroke();
+              }
+            } else {
+              context.save();
+              context.beginPath();
+              context.rect(rect.x, rect.y, rect.w, rect.h);
+              context.clip();
+              drawImageCover(context, img, rect.x, rect.y, rect.w, rect.h);
+              context.restore();
+              if ((state.center && pos === CENTER_POS && id === state.center) || preferredIds.has(id)) {
+                context.lineWidth = 4;
+                context.strokeStyle = preferredIds.has(id) ? "#d33f3f" : "#ffd84a";
+                context.strokeRect(rect.x + 2, rect.y + 2, rect.w - 4, rect.h - 4);
+              }
+            }
+          });
+        });
+
+        const filename = `tablitas-pozito-${state.boardCount}.png`;
+        const dataUrl = canvas.toDataURL("image/png");
+
+        if (window.pozitoApp) {
+          await window.pozitoApp.savePNG(dataUrl, filename);
+        } else {
+          const link = document.createElement("a");
+          link.download = filename;
+          link.href = dataUrl;
+          link.click();
+        }
+        showToast("");
+      } catch (error) {
+        showToast("No se pudo descargar el PNG. Revisa que la pagina este abierta desde http://localhost:8000.");
+        console.error(error);
+      } finally {
+        button.disabled = false;
+        button.textContent = "Descargar PNG";
+      }
+    }
+
+    function renderSheet() {
+      const { cols, rows } = boardGrid();
+      const circleGap = Math.max(6, Math.min(16, 18 - Math.ceil(state.boardCount / 3)));
+      const showSide = state.showCenterPanel || state.showPrefsPanel;
+      $("#sheet").style.setProperty("--cols", cols);
+      $("#sheet").style.setProperty("--rows", rows);
+      $("#sheet").style.setProperty("--board-gap", state.cardShape === "circle" ? `${circleGap}px` : "8px");
+      applyTheme();
+      $("#sheet").classList.toggle("no-side", !showSide);
+      $("#sheet").style.aspectRatio = `${(showSide ? 240 : 0) + cols * 245} / ${rows * 324}`;
+      $("#countBadge").textContent = state.boardCount;
+      $("#sidePanel").classList.toggle("hide-center", !state.showCenterPanel);
+      $("#sidePanel").classList.toggle("hide-prefs", !state.showPrefsPanel);
+      $("#centerBox").hidden = !state.showCenterPanel;
+      $("#prefsBox").hidden = !state.showPrefsPanel;
+      $("#centerMini").outerHTML = renderMiniCard(state.center, "center-mark", "Sin centro").replace("<div", "<div id=\"centerMini\"");
+      $("#prefMini").innerHTML = state.prefs.length
+        ? state.prefs.map(id => renderMiniCard(id, "pref-mark", "")).join("")
+        : `<div class="mini-card">Sin preferidas</div>`;
+      if (state.showPrefsPanel) fitPreferredMiniCards();
+
+      $("#boards").innerHTML = state.boards.map((slots, boardIndex) => {
+        const preferredIds = new Set((preferredPlacementsForBoard(boardIndex) || []).map(item => item.id));
+        const cells = slots.map((id, pos) => {
+          const classes = [
+            "cell",
+            state.center && pos === CENTER_POS && id === state.center ? "center" : "",
+            preferredIds.has(id) ? "preferred" : ""
+          ].filter(Boolean).join(" ");
+          return `<div class="${classes}">${imageHTML(id)}</div>`;
+        }).join("");
+        return `<div class="board" aria-label="Tabla ${boardIndex + 1}">${cells}</div>`;
+      }).join("");
+
+    }
+
+    function renderStatus() {
+      const center = state.center ? fallbackText(state.center) : "Sin centro";
+      $("#centerStatus").textContent = center;
+      $("#prefStatus").textContent = `${state.prefs.length} de 4${state.repeatPrefs ? ", en todas" : ", rotando"}`;
+      $("#boardCount").value = state.boardCount;
+    }
+
+    function renderAll() {
+      showToast("");
+      buildBoards();
+      renderStatus();
+      renderCenterPicker();
+      renderCards();
+      renderSheet();
+    }
+
+    function togglePreferred(id) {
+      if (state.center === id) {
+        showToast("Esa carta ya esta en el centro. Quita el centro o elige otra preferida.");
+        return;
+      }
+
+      if (state.prefs.includes(id)) {
+        state.prefs = state.prefs.filter(pref => pref !== id);
+      } else if (state.prefs.length >= 4) {
+        showToast("Maximo 4 preferidas. Quita una para agregar otra.");
+        return;
+      } else {
+        state.prefs.push(id);
+      }
+
+      renderAll();
+    }
+
+    $("#deckSelect").addEventListener("change", event => {
+      state.deck = event.target.value;
+      renderAll();
+    });
+
+    $("#boardCount").addEventListener("change", event => {
+      state.boardCount = clampBoards(event.target.value);
+      renderAll();
+    });
+
+    $("#centerSelect").addEventListener("change", event => {
+      selectCenter(event.target.value);
+    });
+
+    $("#centerTrigger").addEventListener("click", () => {
+      const isOpen = $("#centerPicker").hasAttribute("open");
+      setCenterPickerOpen(!isOpen);
+    });
+
+    document.addEventListener("click", event => {
+      if (!$("#centerPicker").contains(event.target)) setCenterPickerOpen(false);
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") setCenterPickerOpen(false);
+    });
+
+    $("#sheetColor").addEventListener("input", event => {
+      state.sheetColor = event.target.value;
+      applyTheme();
+    });
+
+    $("#cardShape").addEventListener("change", event => {
+      state.cardShape = event.target.value;
+      renderSheet();
+    });
+
+    $("#showCenterPanel").addEventListener("change", event => {
+      state.showCenterPanel = event.target.checked;
+      renderSheet();
+    });
+
+    $("#showPrefsPanel").addEventListener("change", event => {
+      state.showPrefsPanel = event.target.checked;
+      renderSheet();
+    });
+
+    $("#repeatPrefs").addEventListener("change", event => {
+      state.repeatPrefs = event.target.checked;
+      renderAll();
+    });
+
+    $("#forceAll").addEventListener("change", event => {
+      state.forceAll = event.target.checked;
+      renderAll();
+    });
+
+    $("#clearBtn").addEventListener("click", () => {
+      state.center = null;
+      state.prefs = [];
+      renderCenterSelect();
+      renderAll();
+    });
+
+    $("#shuffleBtn").addEventListener("click", () => {
+      renderAll();
+    });
+
+    $("#generateBtn").addEventListener("click", renderAll);
+    $("#downloadBtn").addEventListener("click", downloadSheetPNG);
+    window.addEventListener("resize", fitPreferredMiniCards);
+
+    renderDeckSelect();
+    renderCenterSelect();
+    renderAll();
+  </script>
+</body>
+</html>
+git rm -r --cached node_modules
+git rm -r --cached dist
