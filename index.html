@@ -395,7 +395,7 @@
 
     .side-list .mini-card {
       width: min(var(--pref-size), 100%);
-      max-height: 100%;
+      height: auto;
     }
 
     .cell,
@@ -432,7 +432,8 @@
       display: grid;
       grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
       grid-template-rows: repeat(var(--rows), minmax(0, 1fr));
-      gap: var(--board-gap);
+      column-gap: var(--board-gap);
+      row-gap: var(--board-gap);
       align-content: center;
     }
 
@@ -444,7 +445,8 @@
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
       grid-template-rows: repeat(4, minmax(0, 1fr));
-      gap: 2px;
+      column-gap: 2px;
+      row-gap: 2px;
       aspect-ratio: 3 / 4;
       background: var(--sheet-bg);
       border: 2px solid var(--sheet-bg);
@@ -458,7 +460,8 @@
     }
 
     .cell.center::after,
-    .cell.preferred::after {
+    .cell.preferred::after,
+    .cell.double::after {
       content: "";
       position: absolute;
       inset: 0;
@@ -468,6 +471,7 @@
 
     .cell.center { --mark: var(--yellow); }
     .cell.preferred { --mark: var(--red); }
+    .cell.double { --mark: var(--teal); }
 
     body[data-card-shape="circle"] .cell {
       display: grid;
@@ -477,7 +481,8 @@
     }
 
     body[data-card-shape="circle"] .cell.center::after,
-    body[data-card-shape="circle"] .cell.preferred::after {
+    body[data-card-shape="circle"] .cell.preferred::after,
+    body[data-card-shape="circle"] .cell.double::after {
       width: 100%;
       aspect-ratio: 1 / 1;
       inset: auto;
@@ -492,8 +497,17 @@
     .card-tile img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
       display: block;
+    }
+
+    .cell img {
+      object-fit: fill;
+    }
+
+    .mini-card img,
+    .card-tile img {
+      object-fit: contain;
+      object-position: center;
     }
 
     .deck-panel {
@@ -592,15 +606,15 @@
     .status strong { color: var(--ink); }
 
     .cards {
-      height: calc(100dvh - 218px);
-      max-height: calc(100dvh - 218px);
+      height: auto;
+      max-height: none;
       padding: 10px;
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       grid-auto-rows: max-content;
       gap: 8px;
       overflow-x: hidden;
-      overflow-y: scroll;
+      overflow-y: auto;
       overscroll-behavior: contain;
       -webkit-overflow-scrolling: touch;
       align-content: start;
@@ -636,8 +650,8 @@
       height: auto;
       aspect-ratio: 1 / 1;
       border-radius: 50%;
-      object-fit: cover;
-      object-position: center 26%;
+      object-fit: fill;
+      object-position: center;
     }
 
     body[data-card-shape="circle"] .mini-card img {
@@ -662,6 +676,7 @@
 
     .card-tile.is-center { outline: 4px solid var(--yellow); outline-offset: -4px; }
     .card-tile.is-pref { outline: 4px solid var(--red); outline-offset: -4px; }
+    .card-tile.is-double { outline: 4px solid var(--teal); outline-offset: -4px; }
 
     .card-tile img { object-fit: contain; }
 
@@ -677,7 +692,7 @@
       .brand { grid-column: 1 / -1; }
       .main { grid-template-columns: 1fr; }
       .deck-panel { position: static; height: min(68dvh, 520px); max-height: min(68dvh, 520px); }
-      .cards { height: calc(min(68dvh, 520px) - 160px); max-height: calc(min(68dvh, 520px) - 160px); }
+      .cards { height: auto; max-height: none; }
       .sheet { min-width: 720px; }
       .center-menu { grid-template-columns: repeat(5, minmax(0, 1fr)); }
     }
@@ -790,7 +805,7 @@
         </div>
       </div>
 
-      <details class="deck-panel" open>
+      <details class="deck-panel" id="deckPanel" open>
         <summary class="deck-head">
           <strong>Cartas de la baraja</strong>
           <span>Click: agrega o quita preferida. Usa el selector de centro para fijar una carta.</span>
@@ -798,18 +813,31 @@
 
         <div class="deck-tools">
           <label class="toggle">
-            <input id="repeatPrefs" type="checkbox" checked>
+            <input id="repeatPrefs" type="checkbox">
             Repetir en todas
+          </label>
+          <label class="toggle">
+            <input id="randomPrefPositions" type="checkbox">
+            Preferidas ubicacion aleatoria
           </label>
           <label class="toggle">
             <input id="forceAll" type="checkbox" checked>
             Repartir todo el mazo
+          </label>
+          <label class="toggle">
+            <input id="doubleBoards" type="checkbox">
+            Tablas dobles
+          </label>
+          <label class="toggle">
+            <input id="randomDoubleCards" type="checkbox" checked>
+            Dobles aleatorios
           </label>
         </div>
 
         <div class="status">
           <div>Centro: <strong id="centerStatus">Sin centro</strong></div>
           <div>Preferidas: <strong id="prefStatus">0 de 4</strong></div>
+          <div>Dobles: <strong id="doubleStatus">Aleatorios</strong></div>
           <div class="toast" id="toast"></div>
         </div>
 
@@ -851,11 +879,14 @@
       { id: "neon", label: "Neon", type: "whatsapp", folder: "Baraja tipo Neon", date: "2026-05-04", specs: [["14.31.11",0,1],["14.31.12",4,1],["14.31.13",4,1],["14.31.14",4,1],["14.31.15",4,1],["14.31.16",5,1],["14.31.17",4,1],["14.31.18",4,1],["14.31.19",4,1],["14.31.20",4,1],["14.31.21",4,1],["14.31.22",1,1]] },
       { id: "rosas", label: "Brillos rosas", type: "whatsapp", folder: "Baraja brillos rosas", date: "2026-05-04", specs: [["15.36.50",4,1],["15.36.51",8,1],["15.36.52",3,1],["15.36.54",0,1],["15.36.57",6,1],["15.36.58",8,1],["15.37.00",2,1],["15.37.01",8,1],["15.37.02",6,1]] },
       { id: "trebol", label: "Trebol", type: "whatsapp", folder: "Baraja trebol", date: "2026-05-04", specs: [["14.30.42",4,1],["14.30.43",2,1],["14.30.44",2,1],["14.30.45",1,1],["14.30.46",1,1],["14.30.47",0,1],["14.30.48",2,1],["14.30.49",1,1],["14.30.50",2,1],["14.30.51",1,1],["14.30.52",1,1],["14.30.53",1,1],["14.30.54",1,1],["14.30.55",4,1],["14.30.56",4,1],["14.30.57",4,1],["14.30.58",4,1],["14.30.59",1,1]] },
-      { id: "galaxy", label: "Galaxy", type: "whatsapp", folder: "Galaxyy", date: "2026-05-04", specs: [["16.36.19",9,1],["16.36.20",11,1],["16.36.21",10,1],["16.36.22",12,1],["16.36.23",7,1]] }
+      { id: "galaxy", label: "Galaxy", type: "whatsapp", folder: "Galaxyy", date: "2026-05-04", specs: [["16.36.19",9,1],["16.36.20",11,1],["16.36.21",10,1],["16.36.22",12,1],["16.36.23",7,1]] },
+      { id: "mario", label: "Mario Bros", type: "whatsapp", folder: "Baraja Mario Bros", date: "2026-05-06", specs: [["18.40.03",0,1],["18.40.04",12,1],["18.40.05",12,1],["18.40.06",11,1],["18.40.07",11,1],["18.40.08",2,1]] },
+      { id: "piolin", label: "Piolin", type: "whatsapp", folder: "Baraja Piolin", date: "2026-05-06", specs: [["18.39.52",0,1],["18.39.53",13,1],["18.39.54",12,1],["18.39.55",13,1],["18.39.56",11,1]] }
     ];
 
     const CARD_COUNT = 16;
     const CENTER_POS = 5;
+    const DOUBLE_POSITIONS = [5, 6];
     const PREF_POSITIONS = [0, 3, 12, 15];
 
     const state = {
@@ -863,7 +894,12 @@
       boardCount: 12,
       center: null,
       prefs: [],
-      repeatPrefs: true,
+      repeatPrefs: false,
+      randomPrefPositions: false,
+      doubleBoards: false,
+      randomDoubleCards: true,
+      doubleSelectMode: false,
+      doubleIds: [],
       forceAll: true,
       showCenterPanel: true,
       showPrefsPanel: true,
@@ -929,12 +965,10 @@
       const count = state.boardCount;
       if (count <= 1) return { cols: 1, rows: 1 };
       if (count <= 4) return { cols: 2, rows: 2 };
-      if (count <= 6) return { cols: 3, rows: 2 };
-      if (count <= 9) return { cols: 3, rows: 3 };
+      if (count <= 10) return { cols: Math.ceil(count / 2), rows: 2 };
       if (count <= 12) return { cols: 4, rows: 3 };
-      if (count <= 16) return { cols: 4, rows: 4 };
-      if (count <= 20) return { cols: 5, rows: 4 };
-      if (count <= 25) return { cols: 5, rows: 5 };
+      if (count <= 18) return { cols: Math.ceil(count / 3), rows: 3 };
+      if (count <= 24) return { cols: Math.ceil(count / 4), rows: 4 };
       return { cols: 6, rows: 5 };
     }
 
@@ -964,6 +998,58 @@
       return `<img src="${imageFor(id)}" alt="${safeText(fig.n)}" onerror="this.replaceWith(document.createTextNode('${fallback}'))">`;
     }
 
+    function validCardId(id) {
+      return FIGURAS.some(fig => fig.id === Number(id));
+    }
+
+    function uniqueValidIds(ids) {
+      return [...new Set(ids.map(Number).filter(validCardId))];
+    }
+
+    function sanitizeState() {
+      state.prefs = uniqueValidIds(state.prefs).slice(0, 4);
+      state.doubleIds = uniqueValidIds(state.doubleIds);
+
+      if (state.doubleBoards) {
+        state.center = null;
+        state.showCenterPanel = false;
+      } else {
+        state.doubleSelectMode = false;
+      }
+
+      if (state.randomDoubleCards) {
+        state.doubleSelectMode = false;
+      }
+
+      if (state.center) {
+        state.showCenterPanel = true;
+        state.prefs = state.prefs.filter(id => id !== state.center);
+        state.doubleIds = state.doubleIds.filter(id => id !== state.center);
+      }
+
+      state.prefs = state.prefs.filter(id => !state.doubleIds.includes(id));
+    }
+
+    function randomOpenPosition(slots, blocked = new Set()) {
+      const positions = [];
+      for (let pos = 0; pos < CARD_COUNT; pos++) {
+        if (!slots[pos] && !blocked.has(pos)) positions.push(pos);
+      }
+      return positions[Math.floor(Math.random() * positions.length)];
+    }
+
+    function doubleIdForBoard(boardIndex, ids, random) {
+      if (!state.doubleBoards) return null;
+      if (state.randomDoubleCards) {
+        const preferredIds = new Set(state.prefs);
+        const candidates = ids.filter(id => !preferredIds.has(id));
+        const pool = candidates.length ? candidates : ids;
+        return pool[Math.floor(random() * pool.length)];
+      }
+      if (!state.doubleIds.length) return null;
+      return state.doubleIds[boardIndex % state.doubleIds.length];
+    }
+
     function preferredPlacementsForBoard(boardIndex) {
       if (!state.prefs.length) return null;
       if (state.repeatPrefs) {
@@ -973,9 +1059,11 @@
         }));
       }
 
+      const groupPosition = boardIndex % 4;
+      if (groupPosition >= state.prefs.length) return [];
       return [{
-        id: state.prefs[boardIndex % state.prefs.length],
-        pos: PREF_POSITIONS[boardIndex % PREF_POSITIONS.length]
+        id: state.prefs[groupPosition],
+        pos: PREF_POSITIONS[groupPosition]
       }];
     }
 
@@ -983,40 +1071,81 @@
       const random = Math.random;
       const ids = FIGURAS.map(fig => fig.id);
       const boards = [];
-      const globalCounts = new Map(ids.map(id => [id, 0]));
+      const blockedFillerIds = new Set(state.prefs);
+      if (state.doubleBoards && !state.randomDoubleCards) {
+        state.doubleIds.forEach(id => blockedFillerIds.add(id));
+      }
 
-      for (let boardIndex = 0; boardIndex < state.boardCount; boardIndex++) {
-        const slots = new Array(CARD_COUNT).fill(null);
-        const used = new Set();
-        const preferredPlacements = preferredPlacementsForBoard(boardIndex) || [];
+      for (let groupStart = 0; groupStart < state.boardCount; groupStart += 4) {
+        const groupEnd = Math.min(groupStart + 4, state.boardCount);
+        const groupSeen = new Set();
+        const groupCounts = new Map(ids.map(id => [id, 0]));
+        const groupBoards = [];
 
-        if (state.center) {
-          slots[CENTER_POS] = state.center;
-          used.add(state.center);
-          globalCounts.set(state.center, globalCounts.get(state.center) + 1);
-        }
-
-        preferredPlacements.forEach(({ id, pos }) => {
-          if (!id || id === state.center || slots[pos]) return;
+        const placeCard = (slots, used, id, pos, allowDuplicate = false) => {
+          if (!id || slots[pos] || (!allowDuplicate && used.has(id))) return false;
           slots[pos] = id;
           used.add(id);
-          globalCounts.set(id, globalCounts.get(id) + 1);
-        });
+          groupSeen.add(id);
+          groupCounts.set(id, groupCounts.get(id) + 1);
+          return true;
+        };
 
-        const available = ids.filter(id => !used.has(id));
-        const ordered = state.forceAll
-          ? shuffle(available, random).sort((a, b) => globalCounts.get(a) - globalCounts.get(b) || random() - .5)
-          : shuffle(available, random);
+        for (let boardIndex = groupStart; boardIndex < groupEnd; boardIndex++) {
+          const slots = new Array(CARD_COUNT).fill(null);
+          const used = new Set();
+          const preferredPlacements = preferredPlacementsForBoard(boardIndex) || [];
+          const doubleId = doubleIdForBoard(boardIndex, ids, random);
 
-        for (let pos = 0; pos < CARD_COUNT; pos++) {
-          if (slots[pos]) continue;
-          const card = ordered.shift();
-          slots[pos] = card;
-          used.add(card);
-          globalCounts.set(card, globalCounts.get(card) + 1);
+          if (doubleId) {
+            DOUBLE_POSITIONS.forEach((pos, index) => {
+              placeCard(slots, used, doubleId, pos, index > 0);
+            });
+          } else if (state.center) {
+            placeCard(slots, used, state.center, CENTER_POS);
+          }
+
+          preferredPlacements.forEach(({ id, pos }) => {
+            if (id === state.center || id === doubleId) return;
+            const targetPos = state.randomPrefPositions
+              ? randomOpenPosition(slots, new Set(DOUBLE_POSITIONS))
+              : pos;
+            placeCard(slots, used, id, targetPos);
+          });
+
+          groupBoards.push({ slots, used });
         }
 
-        boards.push(slots);
+        groupBoards.forEach(({ slots, used }) => {
+          for (let pos = 0; pos < CARD_COUNT; pos++) {
+            if (slots[pos]) continue;
+
+            let candidates = ids.filter(id => (
+              !used.has(id) &&
+              !blockedFillerIds.has(id) &&
+              (!state.forceAll || !groupSeen.has(id))
+            ));
+
+            if (!candidates.length) {
+              candidates = ids.filter(id => !used.has(id) && !blockedFillerIds.has(id));
+            }
+
+            if (!candidates.length) {
+              candidates = ids.filter(id => !used.has(id));
+            }
+
+            const ordered = shuffle(candidates, random).sort((a, b) => (
+              state.forceAll
+                ? groupCounts.get(a) - groupCounts.get(b) || random() - .5
+                : random() - .5
+            ));
+
+            const card = ordered[0];
+            placeCard(slots, used, card, pos);
+          }
+
+          boards.push(slots);
+        });
       }
 
       state.boards = boards;
@@ -1040,11 +1169,13 @@
 
     function renderCards() {
       const prefSet = new Set(state.prefs);
+      const doubleSet = new Set(state.doubleIds);
       $("#cards").innerHTML = FIGURAS.map(fig => {
         const classes = [
           "card-tile",
           state.center === fig.id ? "is-center" : "",
-          prefSet.has(fig.id) ? "is-pref" : ""
+          prefSet.has(fig.id) ? "is-pref" : "",
+          doubleSet.has(fig.id) ? "is-double" : ""
         ].filter(Boolean).join(" ");
         return `
           <button class="${classes}" type="button" data-card="${fig.id}" aria-label="${safeText(fig.n)}">
@@ -1054,7 +1185,10 @@
       }).join("");
 
       document.querySelectorAll("[data-card]").forEach(button => {
-        button.addEventListener("click", () => togglePreferred(Number(button.dataset.card)));
+        button.addEventListener("click", () => {
+          const id = Number(button.dataset.card);
+          state.doubleSelectMode ? toggleDoubleCard(id) : togglePreferred(id);
+        });
       });
     }
 
@@ -1088,7 +1222,13 @@
 
     function selectCenter(value) {
       state.center = value ? Number(value) : null;
+      if (state.center) {
+        state.doubleBoards = false;
+        state.doubleSelectMode = false;
+        state.showCenterPanel = true;
+      }
       state.prefs = state.prefs.filter(id => id !== state.center);
+      state.doubleIds = state.doubleIds.filter(id => id !== state.center);
       setCenterPickerOpen(false);
       renderAll();
     }
@@ -1105,6 +1245,10 @@
       $("#cardShape").value = state.cardShape;
       $("#showCenterPanel").checked = state.showCenterPanel;
       $("#showPrefsPanel").checked = state.showPrefsPanel;
+      $("#repeatPrefs").checked = state.repeatPrefs;
+      $("#randomPrefPositions").checked = state.randomPrefPositions;
+      $("#doubleBoards").checked = state.doubleBoards;
+      $("#randomDoubleCards").checked = state.randomDoubleCards;
       document.body.dataset.cardShape = state.cardShape;
     }
 
@@ -1117,7 +1261,7 @@
       const rowHeight = Math.max(0, (availableHeight - gap * (count - 1)) / count);
       const cardWidth = Math.floor(Math.min(availableWidth, rowHeight * .75));
       list.style.gridTemplateRows = `repeat(${count}, minmax(0, 1fr))`;
-      list.style.setProperty("--pref-size", `${Math.max(54, cardWidth)}px`);
+      list.style.setProperty("--pref-size", `${Math.max(24, cardWidth)}px`);
     }
 
     function loadImage(src) {
@@ -1136,6 +1280,18 @@
         y: rect.top - base.top,
         w: rect.width,
         h: rect.height
+      };
+    }
+
+    function pixelRect(element, base) {
+      const rect = relativeRect(element, base);
+      const x = Math.round(rect.x);
+      const y = Math.round(rect.y);
+      return {
+        x,
+        y,
+        w: Math.round(rect.x + rect.w) - x,
+        h: Math.round(rect.y + rect.h) - y
       };
     }
 
@@ -1169,6 +1325,10 @@
       }
 
       context.drawImage(img, sx, sy, sw, sh, x, y, width, height);
+    }
+
+    function drawImageFill(context, img, x, y, width, height) {
+      context.drawImage(img, x, y, width, height);
     }
 
     function drawImageContain(context, img, x, y, width, height) {
@@ -1257,7 +1417,16 @@
             const rect = relativeRect(box, sheetRect);
             drawPanelBox(context, rect);
             drawCenteredText(context, "CENTRO", rect.x + rect.w / 2, rect.y + 22, 14, 900, "#7a8497");
-            if (state.center) drawMiniCard(context, images.get(state.center), relativeRect($("#centerMini"), sheetRect), "#ffd84a");
+            if (state.center) {
+              drawMiniCard(context, images.get(state.center), relativeRect($("#centerMini"), sheetRect), "#ffd84a");
+            } else if (state.doubleBoards) {
+              const miniRect = relativeRect($("#centerMini"), sheetRect);
+              roundedRectPath(context, miniRect.x, miniRect.y, miniRect.w, miniRect.h, 6);
+              context.lineWidth = 2;
+              context.strokeStyle = "#ffd84a";
+              context.stroke();
+              drawCenteredText(context, "DOBLES", miniRect.x + miniRect.w / 2, miniRect.y + miniRect.h / 2, Math.min(18, miniRect.w * .2), 900, "#7a8497");
+            }
           }
 
           if (state.showPrefsPanel) {
@@ -1279,15 +1448,19 @@
         }
 
         document.querySelectorAll(".board").forEach((board, boardIndex) => {
-          const boardRect = relativeRect(board, sheetRect);
+          const boardRect = pixelRect(board, sheetRect);
           context.fillStyle = state.sheetColor;
           context.fillRect(boardRect.x, boardRect.y, boardRect.w, boardRect.h);
           const preferredIds = new Set((preferredPlacementsForBoard(boardIndex) || []).map(item => item.id));
+          const slots = state.boards[boardIndex];
 
           [...board.children].forEach((cell, pos) => {
-            const id = state.boards[boardIndex][pos];
+            const id = slots[pos];
             const img = images.get(id);
-            const rect = relativeRect(cell, sheetRect);
+            const rect = pixelRect(cell, sheetRect);
+            const isCenter = state.center && pos === CENTER_POS && id === state.center;
+            const isPreferred = preferredIds.has(id);
+            const isDouble = state.doubleBoards && DOUBLE_POSITIONS.includes(pos) && slots[DOUBLE_POSITIONS[0]] === slots[DOUBLE_POSITIONS[1]];
             if (!img) return;
 
             if (state.cardShape === "circle") {
@@ -1298,11 +1471,11 @@
               context.beginPath();
               context.arc(x + size / 2, y + size / 2, size / 2, 0, Math.PI * 2);
               context.clip();
-              drawImageCover(context, img, x, y, size, size, .26);
+              drawImageFill(context, img, x, y, size, size);
               context.restore();
-              if ((state.center && pos === CENTER_POS && id === state.center) || preferredIds.has(id)) {
+              if (isCenter || isPreferred || isDouble) {
                 context.lineWidth = 4;
-                context.strokeStyle = preferredIds.has(id) ? "#d33f3f" : "#ffd84a";
+                context.strokeStyle = isDouble ? "#0f9f9a" : (isPreferred ? "#d33f3f" : "#ffd84a");
                 context.beginPath();
                 context.arc(x + size / 2, y + size / 2, size / 2 - 2, 0, Math.PI * 2);
                 context.stroke();
@@ -1312,11 +1485,11 @@
               context.beginPath();
               context.rect(rect.x, rect.y, rect.w, rect.h);
               context.clip();
-              drawImageCover(context, img, rect.x, rect.y, rect.w, rect.h);
+              drawImageFill(context, img, rect.x, rect.y, rect.w, rect.h);
               context.restore();
-              if ((state.center && pos === CENTER_POS && id === state.center) || preferredIds.has(id)) {
+              if (isCenter || isPreferred || isDouble) {
                 context.lineWidth = 4;
-                context.strokeStyle = preferredIds.has(id) ? "#d33f3f" : "#ffd84a";
+                context.strokeStyle = isDouble ? "#0f9f9a" : (isPreferred ? "#d33f3f" : "#ffd84a");
                 context.strokeRect(rect.x + 2, rect.y + 2, rect.w - 4, rect.h - 4);
               }
             }
@@ -1346,20 +1519,29 @@
 
     function renderSheet() {
       const { cols, rows } = boardGrid();
-      const circleGap = Math.max(6, Math.min(16, 18 - Math.ceil(state.boardCount / 3)));
+      const boardGap = 8;
       const showSide = state.showCenterPanel || state.showPrefsPanel;
       $("#sheet").style.setProperty("--cols", cols);
       $("#sheet").style.setProperty("--rows", rows);
-      $("#sheet").style.setProperty("--board-gap", state.cardShape === "circle" ? `${circleGap}px` : "8px");
+      $("#sheet").style.setProperty("--board-gap", `${boardGap}px`);
       applyTheme();
       $("#sheet").classList.toggle("no-side", !showSide);
-      $("#sheet").style.aspectRatio = `${(showSide ? 240 : 0) + cols * 245} / ${rows * 324}`;
+      const sideWidth = showSide ? 240 : 0;
+      const sideGap = showSide ? 8 : 0;
+      const boardWidth = 240;
+      const boardHeight = 320;
+      const sheetWidth = sideWidth + sideGap + cols * boardWidth + (cols - 1) * boardGap;
+      const sheetHeight = rows * boardHeight + (rows - 1) * boardGap;
+      $("#sheet").style.aspectRatio = `${sheetWidth} / ${sheetHeight}`;
       $("#countBadge").textContent = state.boardCount;
       $("#sidePanel").classList.toggle("hide-center", !state.showCenterPanel);
       $("#sidePanel").classList.toggle("hide-prefs", !state.showPrefsPanel);
       $("#centerBox").hidden = !state.showCenterPanel;
       $("#prefsBox").hidden = !state.showPrefsPanel;
-      $("#centerMini").outerHTML = renderMiniCard(state.center, "center-mark", "Sin centro").replace("<div", "<div id=\"centerMini\"");
+      const centerMini = state.doubleBoards
+        ? `<div id="centerMini" class="mini-card center-mark">Dobles</div>`
+        : renderMiniCard(state.center, "center-mark", "Sin centro").replace("<div", "<div id=\"centerMini\"");
+      $("#centerMini").outerHTML = centerMini;
       $("#prefMini").innerHTML = state.prefs.length
         ? state.prefs.map(id => renderMiniCard(id, "pref-mark", "")).join("")
         : `<div class="mini-card">Sin preferidas</div>`;
@@ -1368,10 +1550,12 @@
       $("#boards").innerHTML = state.boards.map((slots, boardIndex) => {
         const preferredIds = new Set((preferredPlacementsForBoard(boardIndex) || []).map(item => item.id));
         const cells = slots.map((id, pos) => {
+          const isDouble = state.doubleBoards && DOUBLE_POSITIONS.includes(pos) && slots[DOUBLE_POSITIONS[0]] === slots[DOUBLE_POSITIONS[1]];
           const classes = [
             "cell",
             state.center && pos === CENTER_POS && id === state.center ? "center" : "",
-            preferredIds.has(id) ? "preferred" : ""
+            preferredIds.has(id) ? "preferred" : "",
+            isDouble ? "double" : ""
           ].filter(Boolean).join(" ");
           return `<div class="${classes}">${imageHTML(id)}</div>`;
         }).join("");
@@ -1381,14 +1565,19 @@
     }
 
     function renderStatus() {
-      const center = state.center ? fallbackText(state.center) : "Sin centro";
+      const center = state.doubleBoards ? "Usando tablas dobles" : (state.center ? fallbackText(state.center) : "Sin centro");
+      const doubleStatus = state.randomDoubleCards
+        ? "Aleatorios"
+        : `${state.doubleIds.length} seleccionada${state.doubleIds.length === 1 ? "" : "s"}`;
       $("#centerStatus").textContent = center;
-      $("#prefStatus").textContent = `${state.prefs.length} de 4${state.repeatPrefs ? ", en todas" : ", rotando"}`;
+      $("#prefStatus").textContent = `${state.prefs.length} de 4${state.repeatPrefs ? ", en todas" : ", por bloque"}${state.randomPrefPositions ? ", aleatorias" : ""}`;
+      $("#doubleStatus").textContent = state.doubleBoards ? doubleStatus : "Apagadas";
       $("#boardCount").value = state.boardCount;
     }
 
     function renderAll() {
       showToast("");
+      sanitizeState();
       buildBoards();
       renderStatus();
       renderCenterPicker();
@@ -1396,9 +1585,27 @@
       renderSheet();
     }
 
+    function toggleDoubleCard(id) {
+      if (state.doubleIds.includes(id)) {
+        state.doubleIds = state.doubleIds.filter(doubleId => doubleId !== id);
+      } else {
+        state.doubleIds.push(id);
+      }
+
+      state.doubleBoards = true;
+      state.randomDoubleCards = false;
+      state.center = null;
+      state.prefs = state.prefs.filter(pref => pref !== id);
+      renderAll();
+    }
+
     function togglePreferred(id) {
       if (state.center === id) {
         showToast("Esa carta ya esta en el centro. Quita el centro o elige otra preferida.");
+        return;
+      }
+      if (state.doubleIds.includes(id)) {
+        showToast("Esa carta ya esta en dobles. Quitala de dobles para usarla como preferida.");
         return;
       }
 
@@ -1453,6 +1660,10 @@
 
     $("#showCenterPanel").addEventListener("change", event => {
       state.showCenterPanel = event.target.checked;
+      if (state.showCenterPanel && state.doubleBoards) {
+        state.doubleBoards = false;
+        state.doubleSelectMode = false;
+      }
       renderSheet();
     });
 
@@ -1466,14 +1677,46 @@
       renderAll();
     });
 
+    $("#randomPrefPositions").addEventListener("change", event => {
+      state.randomPrefPositions = event.target.checked;
+      renderAll();
+    });
+
     $("#forceAll").addEventListener("change", event => {
       state.forceAll = event.target.checked;
       renderAll();
     });
 
+    $("#doubleBoards").addEventListener("change", event => {
+      state.doubleBoards = event.target.checked;
+      if (state.doubleBoards) {
+        state.center = null;
+        state.showCenterPanel = false;
+      } else {
+        state.doubleSelectMode = false;
+      }
+      renderAll();
+    });
+
+    $("#randomDoubleCards").addEventListener("change", event => {
+      state.randomDoubleCards = event.target.checked;
+      state.doubleBoards = true;
+      state.center = null;
+      state.showCenterPanel = false;
+      state.doubleSelectMode = !state.randomDoubleCards;
+      $("#deckPanel").open = true;
+      renderAll();
+      if (!state.randomDoubleCards) {
+        $("#cards").scrollIntoView({ block: "nearest" });
+        showToast("Modo manual activo: da click en las cartas que quieres usar como dobles.");
+      }
+    });
+
     $("#clearBtn").addEventListener("click", () => {
       state.center = null;
       state.prefs = [];
+      state.doubleIds = [];
+      state.doubleSelectMode = false;
       renderCenterSelect();
       renderAll();
     });
@@ -1492,5 +1735,3 @@
   </script>
 </body>
 </html>
-git rm -r --cached node_modules
-git rm -r --cached dist
