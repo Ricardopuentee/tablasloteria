@@ -57,7 +57,7 @@
       border-radius: 16px;
       padding: 12px;
       display: grid;
-      grid-template-columns: 132px 132px minmax(180px, 1fr) 146px 118px 118px 108px 118px 118px 146px;
+      grid-template-columns: 132px 132px minmax(180px, 1fr) 146px 118px 108px 108px 118px 118px 118px 146px 130px;
       gap: 10px;
       align-items: end;
     }
@@ -308,18 +308,20 @@
       --side-width: 230px;
       --sheet-side-width: var(--side-width);
       --side-card-size: 104px;
-      --board-gap: 4px;
+      --frame-size: 4px;
+      --board-gap: 6px;
       --sheet-bg: #101828;
       --panel-bg: var(--sheet-bg);
+      --board-frame-color: #000000;
       width: 100%;
       min-width: 760px;
       aspect-ratio: 1170 / 972;
       background: var(--sheet-bg);
-      border: 3px solid var(--sheet-bg);
+      border: 0;
       display: grid;
       grid-template-columns: var(--sheet-side-width) 1fr;
-      gap: 4px;
-      padding: 4px;
+      gap: var(--frame-size);
+      padding: var(--frame-size);
     }
 
     .sheet.no-side {
@@ -451,8 +453,8 @@
       column-gap: 1px;
       row-gap: 1px;
       aspect-ratio: 3 / 4;
-      background: var(--sheet-bg);
-      border: 1px solid var(--sheet-bg);
+      background: var(--board-frame-color);
+      border: 5px solid var(--board-frame-color);
       min-width: 0;
     }
 
@@ -773,6 +775,11 @@
         <input id="sheetColor" type="color" value="#101828">
       </label>
 
+      <label class="field" for="boardFrameColor">
+        <span>Marco</span>
+        <input id="boardFrameColor" type="color" value="#000000">
+      </label>
+
       <label class="field" for="sideCardSize">
         <span>Lateral</span>
         <input id="sideCardSize" type="range" min="48" max="180" value="104">
@@ -782,6 +789,7 @@
       <button class="btn" id="shuffleBtn" type="button">Mezclar</button>
       <button class="btn" id="generateBtn" type="button">Generar</button>
       <button class="btn primary" id="downloadBtn" type="button">Descargar PNG</button>
+      <button class="btn primary" id="batchBtn" type="button">20 PNGs</button>
     </section>
 
     <section class="main">
@@ -907,6 +915,7 @@
       showCenterPanel: true,
       showPrefsPanel: true,
       sheetColor: "#101828",
+      boardFrameColor: "#000000",
       sideCardSize: 104,
       cardShape: "rectangle",
       boards: []
@@ -1241,7 +1250,9 @@
     function applyTheme() {
       $("#sheet").style.setProperty("--sheet-bg", state.sheetColor);
       $("#sheet").style.setProperty("--panel-bg", state.sheetColor);
+      $("#sheet").style.setProperty("--board-frame-color", state.boardFrameColor);
       $("#sheetColor").value = state.sheetColor;
+      $("#boardFrameColor").value = state.boardFrameColor;
       $("#sideCardSize").value = state.sideCardSize;
       $("#cardShape").value = state.cardShape;
       $("#showCenterPanel").checked = state.showCenterPanel;
@@ -1410,10 +1421,10 @@
       context.stroke();
     }
 
-    async function downloadSheetPNG() {
-      const button = $("#downloadBtn");
+    async function renderSheetPNGDataUrl() {
       const sheet = $("#sheet");
       const sheetRect = sheet.getBoundingClientRect();
+      const sheetStyles = getComputedStyle(sheet);
       const width = Math.ceil(sheetRect.width);
       const height = Math.ceil(sheetRect.height);
       const scale = 2;
@@ -1422,9 +1433,6 @@
         ...state.prefs,
         ...state.boards.flat()
       ];
-
-      button.disabled = true;
-      button.textContent = "Preparando...";
 
       try {
         const images = await imageCacheFor(allIds);
@@ -1482,7 +1490,7 @@
 
         document.querySelectorAll(".board").forEach((board, boardIndex) => {
           const boardRect = pixelRect(board, sheetRect);
-          context.fillStyle = state.sheetColor;
+          context.fillStyle = state.boardFrameColor;
           context.fillRect(boardRect.x, boardRect.y, boardRect.w, boardRect.h);
           const slots = state.boards[boardIndex];
 
@@ -1528,15 +1536,43 @@
 
         const filename = `tablitas-pozito-${state.boardCount}.png`;
         const dataUrl = canvas.toDataURL("image/png");
+        return { dataUrl, filename };
+      } catch (error) {
+        console.error(error);
+        throw error;
+      }
+    }
 
-        if (window.pozitoApp) {
-          await window.pozitoApp.savePNG(dataUrl, filename);
-        } else {
-          const link = document.createElement("a");
-          link.download = filename;
-          link.href = dataUrl;
-          link.click();
-        }
+    async function downloadDataUrl(dataUrl, filename, directoryHandle = null) {
+      if (directoryHandle) {
+        const response = await fetch(dataUrl);
+        const blob = await response.blob();
+        const fileHandle = await directoryHandle.getFileHandle(filename, { create: true });
+        const writable = await fileHandle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+        return;
+      }
+
+      if (window.pozitoApp) {
+        await window.pozitoApp.savePNG(dataUrl, filename);
+        return;
+      }
+
+      const link = document.createElement("a");
+      link.download = filename;
+      link.href = dataUrl;
+      link.click();
+    }
+
+    async function downloadSheetPNG() {
+      const button = $("#downloadBtn");
+      button.disabled = true;
+      button.textContent = "Preparando...";
+
+      try {
+        const { dataUrl, filename } = await renderSheetPNGDataUrl();
+        await downloadDataUrl(dataUrl, filename);
         showToast("");
       } catch (error) {
         showToast("No se pudo descargar el PNG. Revisa que la pagina este abierta desde http://localhost:8000.");
@@ -1547,6 +1583,115 @@
       }
     }
 
+    function nextFrame() {
+      return new Promise(resolve => requestAnimationFrame(() => resolve()));
+    }
+
+    function snapshotState() {
+      return {
+        ...state,
+        prefs: [...state.prefs],
+        doubleIds: [...state.doubleIds],
+        boards: state.boards.map(slots => [...slots])
+      };
+    }
+
+    function restoreState(snapshot) {
+      Object.assign(state, {
+        ...snapshot,
+        prefs: [...snapshot.prefs],
+        doubleIds: [...snapshot.doubleIds],
+        boards: snapshot.boards.map(slots => [...slots])
+      });
+    }
+
+    function countMap(ids) {
+      return new Map(ids.map(id => [id, 0]));
+    }
+
+    function leastUsedIds(count, counts, blocked = new Set()) {
+      const candidates = FIGURAS
+        .map(fig => fig.id)
+        .filter(id => !blocked.has(id))
+        .sort((a, b) => counts.get(a) - counts.get(b) || Math.random() - .5);
+      const picked = candidates.slice(0, count);
+      picked.forEach(id => counts.set(id, counts.get(id) + 1));
+      return picked;
+    }
+
+    async function chooseBatchDirectory() {
+      if (!window.showDirectoryPicker) return null;
+      try {
+        return await window.showDirectoryPicker({ mode: "readwrite" });
+      } catch (error) {
+        if (error && error.name === "AbortError") throw error;
+        return null;
+      }
+    }
+
+    async function downloadBatchPNGs() {
+      const button = $("#batchBtn");
+      const original = snapshotState();
+      const ids = FIGURAS.map(fig => fig.id);
+      const prefCounts = countMap(ids);
+      const centerCounts = countMap(ids);
+      const doubleCounts = countMap(ids);
+      let directoryHandle = null;
+
+      button.disabled = true;
+      $("#downloadBtn").disabled = true;
+
+      try {
+        directoryHandle = await chooseBatchDirectory();
+        for (let index = 1; index <= 20; index++) {
+          button.textContent = `${index}/20`;
+
+          if (original.doubleBoards) {
+            state.doubleBoards = true;
+            state.randomDoubleCards = false;
+            state.doubleSelectMode = false;
+            state.center = null;
+            state.prefs = [];
+            state.showCenterPanel = false;
+            state.showPrefsPanel = false;
+            state.doubleIds = leastUsedIds(state.boardCount, doubleCounts);
+          } else {
+            const prefCount = 1 + Math.floor(Math.random() * 4);
+            state.doubleBoards = false;
+            state.randomDoubleCards = true;
+            state.doubleSelectMode = false;
+            state.doubleIds = [];
+            state.showCenterPanel = true;
+            state.showPrefsPanel = true;
+            state.prefs = leastUsedIds(prefCount, prefCounts);
+            state.center = leastUsedIds(1, centerCounts, new Set(state.prefs))[0] || null;
+          }
+
+          renderAll();
+          await nextFrame();
+          const { dataUrl } = await renderSheetPNGDataUrl();
+          const mode = original.doubleBoards ? "dobles" : "preferidas";
+          const filename = `juego-${mode}-${String(index).padStart(2, "0")}.png`;
+          await downloadDataUrl(dataUrl, filename, directoryHandle);
+        }
+
+        showToast(directoryHandle
+          ? "Listo: se guardaron 20 PNGs en la carpeta elegida."
+          : "Listo: se descargaron 20 PNGs.");
+      } catch (error) {
+        if (!error || error.name !== "AbortError") {
+          showToast("No se pudo generar el paquete de 20 PNGs.");
+          console.error(error);
+        }
+      } finally {
+        restoreState(original);
+        renderAll();
+        button.disabled = false;
+        $("#downloadBtn").disabled = false;
+        button.textContent = "20 PNGs";
+      }
+    }
+
     function sidePanelWidth(showSide) {
       if (!showSide) return 0;
       return Math.round(Math.max(140, Math.min(300, state.sideCardSize + 82)));
@@ -1554,19 +1699,21 @@
 
     function renderSheet() {
       const { cols, rows } = boardGrid();
-      const boardGap = 4;
+      const frameSize = 4;
+      const boardGap = 6;
       const showSide = state.showCenterPanel || state.showPrefsPanel;
       $("#sheet").style.setProperty("--cols", cols);
       $("#sheet").style.setProperty("--rows", rows);
       $("#sheet").style.setProperty("--board-gap", `${boardGap}px`);
+      $("#sheet").style.setProperty("--frame-size", `${frameSize}px`);
       applyTheme();
       $("#sheet").classList.toggle("no-side", !showSide);
       const sideWidth = sidePanelWidth(showSide);
-      const sideGap = showSide ? 4 : 0;
+      const sideGap = showSide ? frameSize : 0;
       const boardWidth = 240;
       const boardHeight = 320;
-      const sheetWidth = sideWidth + sideGap + cols * boardWidth + (cols - 1) * boardGap;
-      const sheetHeight = rows * boardHeight + (rows - 1) * boardGap;
+      const sheetWidth = frameSize * 2 + sideWidth + sideGap + cols * boardWidth + (cols - 1) * boardGap;
+      const sheetHeight = frameSize * 2 + rows * boardHeight + (rows - 1) * boardGap;
       $("#sheet").style.setProperty("--side-width", `${sideWidth}px`);
       $("#sheet").style.aspectRatio = `${sheetWidth} / ${sheetHeight}`;
       $("#countBadge").textContent = state.boardCount;
@@ -1689,6 +1836,11 @@
       applyTheme();
     });
 
+    $("#boardFrameColor").addEventListener("input", event => {
+      state.boardFrameColor = event.target.value;
+      applyTheme();
+    });
+
     $("#sideCardSize").addEventListener("input", event => {
       state.sideCardSize = Number(event.target.value) || 104;
       renderSheet();
@@ -1768,6 +1920,7 @@
 
     $("#generateBtn").addEventListener("click", renderAll);
     $("#downloadBtn").addEventListener("click", downloadSheetPNG);
+    $("#batchBtn").addEventListener("click", downloadBatchPNGs);
     window.addEventListener("resize", fitSideMiniCards);
 
     renderDeckSelect();
