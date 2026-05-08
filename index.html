@@ -57,7 +57,7 @@
       border-radius: 16px;
       padding: 12px;
       display: grid;
-      grid-template-columns: 132px 132px minmax(180px, 1fr) 146px 118px 108px 118px 118px 146px;
+      grid-template-columns: 132px 132px minmax(180px, 1fr) 146px 118px 118px 108px 118px 118px 146px;
       gap: 10px;
       align-items: end;
     }
@@ -237,11 +237,6 @@
       color: var(--muted);
     }
 
-    .center-option.is-selected {
-      outline: 4px solid var(--yellow);
-      outline-offset: -4px;
-    }
-
     .center-option img {
       width: 100%;
       height: 100%;
@@ -258,6 +253,13 @@
       border-radius: 9px;
       background: var(--paper);
       padding: 4px;
+      cursor: pointer;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      min-height: 40px;
+      accent-color: var(--teal);
       cursor: pointer;
     }
 
@@ -305,18 +307,19 @@
       --rows: 3;
       --side-width: 230px;
       --sheet-side-width: var(--side-width);
-      --board-gap: 8px;
+      --side-card-size: 104px;
+      --board-gap: 4px;
       --sheet-bg: #101828;
       --panel-bg: var(--sheet-bg);
       width: 100%;
       min-width: 760px;
       aspect-ratio: 1170 / 972;
       background: var(--sheet-bg);
-      border: 6px solid var(--sheet-bg);
+      border: 3px solid var(--sheet-bg);
       display: grid;
       grid-template-columns: var(--sheet-side-width) 1fr;
-      gap: 8px;
-      padding: 8px;
+      gap: 4px;
+      padding: 4px;
     }
 
     .sheet.no-side {
@@ -331,15 +334,15 @@
     .side {
       background: var(--panel-bg);
       display: grid;
-      grid-template-rows: auto auto 1fr;
-      gap: 10px;
-      padding: 10px;
+      grid-template-rows: auto auto auto;
+      gap: 6px;
+      padding: 6px;
       align-content: start;
       min-height: 0;
     }
 
     .side.hide-center.hide-prefs { grid-template-rows: auto; }
-    .side.hide-center:not(.hide-prefs) { grid-template-rows: auto minmax(0, 1fr); }
+    .side.hide-center:not(.hide-prefs) { grid-template-rows: auto auto; }
     .side:not(.hide-center).hide-prefs { grid-template-rows: auto auto; }
 
     .count-panel {
@@ -369,10 +372,10 @@
       background: var(--panel-bg);
       border: 1px solid #edf1f7;
       border-radius: 8px;
-      padding: 8px;
+      padding: 5px;
       display: grid;
-      grid-template-rows: auto minmax(0, 1fr);
-      gap: 7px;
+      grid-template-rows: auto auto;
+      gap: 5px;
       justify-items: center;
       align-content: start;
       min-height: 0;
@@ -381,15 +384,15 @@
     .side-box[hidden] { display: none !important; }
 
     .side-list {
-      --pref-size: 120px;
+      --pref-size: var(--side-card-size);
       width: 100%;
-      height: 100%;
+      height: auto;
       min-height: 0;
       display: grid;
       grid-template-columns: minmax(0, 1fr);
-      gap: 12px;
+      gap: 5px;
       justify-items: center;
-      align-content: stretch;
+      align-content: start;
       align-items: center;
     }
 
@@ -407,7 +410,7 @@
     .mini-card {
       overflow: hidden;
       background: var(--panel-bg);
-      width: min(104px, 100%);
+      width: min(var(--side-card-size), 100%);
       aspect-ratio: 3 / 4;
       border-radius: 6px;
       border: 2px solid var(--line);
@@ -420,8 +423,8 @@
       line-height: 1.05;
     }
 
-    .mini-card.center-mark { border-color: var(--yellow); }
-    .mini-card.pref-mark { border-color: var(--red); }
+    .mini-card.center-mark,
+    .mini-card.pref-mark { border-color: var(--line); }
 
     body[data-card-shape="circle"] .mini-card {
       aspect-ratio: 3 / 4;
@@ -445,11 +448,11 @@
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
       grid-template-rows: repeat(4, minmax(0, 1fr));
-      column-gap: 2px;
-      row-gap: 2px;
+      column-gap: 1px;
+      row-gap: 1px;
       aspect-ratio: 3 / 4;
       background: var(--sheet-bg);
-      border: 2px solid var(--sheet-bg);
+      border: 1px solid var(--sheet-bg);
       min-width: 0;
     }
 
@@ -459,8 +462,6 @@
       min-height: 0;
     }
 
-    .cell.center::after,
-    .cell.preferred::after,
     .cell.double::after {
       content: "";
       position: absolute;
@@ -469,8 +470,6 @@
       box-shadow: inset 0 0 0 3px var(--mark);
     }
 
-    .cell.center { --mark: var(--yellow); }
-    .cell.preferred { --mark: var(--red); }
     .cell.double { --mark: var(--teal); }
 
     body[data-card-shape="circle"] .cell {
@@ -480,8 +479,6 @@
       overflow: visible;
     }
 
-    body[data-card-shape="circle"] .cell.center::after,
-    body[data-card-shape="circle"] .cell.preferred::after,
     body[data-card-shape="circle"] .cell.double::after {
       width: 100%;
       aspect-ratio: 1 / 1;
@@ -516,13 +513,15 @@
       border-radius: 18px;
       height: calc(100dvh - 28px);
       max-height: calc(100dvh - 28px);
-      overflow: hidden;
-      display: grid;
-      grid-template-rows: auto auto auto minmax(0, 1fr);
-      min-height: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      display: block;
+      touch-action: pan-y;
     }
 
-    .deck-panel[open] { display: grid; }
+    .deck-panel[open] { display: block; }
 
     .deck-panel:not([open]) {
       display: block;
@@ -613,10 +612,8 @@
       grid-template-columns: repeat(3, minmax(0, 1fr));
       grid-auto-rows: max-content;
       gap: 8px;
-      overflow-x: hidden;
-      overflow-y: auto;
-      overscroll-behavior: contain;
-      -webkit-overflow-scrolling: touch;
+      overflow: visible;
+      touch-action: pan-y;
       align-content: start;
       align-items: start;
       min-height: 0;
@@ -633,6 +630,7 @@
       height: auto;
       position: relative;
       background: #f8fafc;
+      touch-action: pan-y;
     }
 
     body[data-card-shape="circle"] .card-tile {
@@ -673,9 +671,9 @@
     }
 
     .card-tile:hover { border-color: #aeb8c9; }
+    .card-tile:focus { outline: none; }
+    .card-tile:focus-visible { outline: 3px solid #aeb8c9; outline-offset: 2px; }
 
-    .card-tile.is-center { outline: 4px solid var(--yellow); outline-offset: -4px; }
-    .card-tile.is-pref { outline: 4px solid var(--red); outline-offset: -4px; }
     .card-tile.is-double { outline: 4px solid var(--teal); outline-offset: -4px; }
 
     .card-tile img { object-fit: contain; }
@@ -773,6 +771,11 @@
       <label class="field" for="sheetColor">
         <span>Fondo</span>
         <input id="sheetColor" type="color" value="#101828">
+      </label>
+
+      <label class="field" for="sideCardSize">
+        <span>Lateral</span>
+        <input id="sideCardSize" type="range" min="48" max="180" value="104">
       </label>
 
       <button class="btn" id="clearBtn" type="button">Limpiar</button>
@@ -904,6 +907,7 @@
       showCenterPanel: true,
       showPrefsPanel: true,
       sheetColor: "#101828",
+      sideCardSize: 104,
       cardShape: "rectangle",
       boards: []
     };
@@ -1038,16 +1042,23 @@
       return positions[Math.floor(Math.random() * positions.length)];
     }
 
-    function doubleIdForBoard(boardIndex, ids, random) {
-      if (!state.doubleBoards) return null;
+    function doubleIdsForBoards(ids, random) {
+      if (!state.doubleBoards) return [];
+
+      const preferredIds = new Set(state.prefs);
+      const usableIds = ids.filter(id => !preferredIds.has(id));
+      const fallbackIds = usableIds.length ? usableIds : ids;
+
       if (state.randomDoubleCards) {
-        const preferredIds = new Set(state.prefs);
-        const candidates = ids.filter(id => !preferredIds.has(id));
-        const pool = candidates.length ? candidates : ids;
-        return pool[Math.floor(random() * pool.length)];
+        return shuffle(fallbackIds, random).slice(0, state.boardCount);
       }
-      if (!state.doubleIds.length) return null;
-      return state.doubleIds[boardIndex % state.doubleIds.length];
+
+      if (!state.doubleIds.length) return [];
+
+      const selected = state.doubleIds.filter(id => fallbackIds.includes(id));
+      const selectedSet = new Set(selected);
+      const fill = shuffle(fallbackIds.filter(id => !selectedSet.has(id)), random);
+      return [...selected, ...fill].slice(0, state.boardCount);
     }
 
     function preferredPlacementsForBoard(boardIndex) {
@@ -1070,85 +1081,74 @@
     function buildBoards() {
       const random = Math.random;
       const ids = FIGURAS.map(fig => fig.id);
-      const boards = [];
       const blockedFillerIds = new Set(state.prefs);
-      if (state.doubleBoards && !state.randomDoubleCards) {
-        state.doubleIds.forEach(id => blockedFillerIds.add(id));
-      }
+      const boardDoubleIds = doubleIdsForBoards(ids, random);
+      if (state.doubleBoards) boardDoubleIds.forEach(id => blockedFillerIds.add(id));
+      const globalCounts = new Map(ids.map(id => [id, 0]));
+      const boardData = [];
 
-      for (let groupStart = 0; groupStart < state.boardCount; groupStart += 4) {
-        const groupEnd = Math.min(groupStart + 4, state.boardCount);
-        const groupSeen = new Set();
-        const groupCounts = new Map(ids.map(id => [id, 0]));
-        const groupBoards = [];
+      const placeCard = (slots, used, id, pos, allowDuplicate = false) => {
+        if (!id || slots[pos] || (!allowDuplicate && used.has(id))) return false;
+        slots[pos] = id;
+        used.add(id);
+        globalCounts.set(id, globalCounts.get(id) + 1);
+        return true;
+      };
 
-        const placeCard = (slots, used, id, pos, allowDuplicate = false) => {
-          if (!id || slots[pos] || (!allowDuplicate && used.has(id))) return false;
-          slots[pos] = id;
-          used.add(id);
-          groupSeen.add(id);
-          groupCounts.set(id, groupCounts.get(id) + 1);
-          return true;
-        };
+      const balancedCard = (slots, used) => {
+        let candidates = ids.filter(id => (
+          !used.has(id) &&
+          !blockedFillerIds.has(id)
+        ));
 
-        for (let boardIndex = groupStart; boardIndex < groupEnd; boardIndex++) {
-          const slots = new Array(CARD_COUNT).fill(null);
-          const used = new Set();
-          const preferredPlacements = preferredPlacementsForBoard(boardIndex) || [];
-          const doubleId = doubleIdForBoard(boardIndex, ids, random);
-
-          if (doubleId) {
-            DOUBLE_POSITIONS.forEach((pos, index) => {
-              placeCard(slots, used, doubleId, pos, index > 0);
-            });
-          } else if (state.center) {
-            placeCard(slots, used, state.center, CENTER_POS);
-          }
-
-          preferredPlacements.forEach(({ id, pos }) => {
-            if (id === state.center || id === doubleId) return;
-            const targetPos = state.randomPrefPositions
-              ? randomOpenPosition(slots, new Set(DOUBLE_POSITIONS))
-              : pos;
-            placeCard(slots, used, id, targetPos);
-          });
-
-          groupBoards.push({ slots, used });
+        if (!candidates.length) {
+          candidates = ids.filter(id => !used.has(id));
         }
 
-        groupBoards.forEach(({ slots, used }) => {
-          for (let pos = 0; pos < CARD_COUNT; pos++) {
-            if (slots[pos]) continue;
+        const ordered = shuffle(candidates, random);
+        if (!state.forceAll) return ordered[0];
 
-            let candidates = ids.filter(id => (
-              !used.has(id) &&
-              !blockedFillerIds.has(id) &&
-              (!state.forceAll || !groupSeen.has(id))
-            ));
+        ordered.sort((a, b) => (
+          globalCounts.get(a) - globalCounts.get(b) || random() - .5
+        ));
+        return ordered[0];
+      };
 
-            if (!candidates.length) {
-              candidates = ids.filter(id => !used.has(id) && !blockedFillerIds.has(id));
-            }
+      for (let boardIndex = 0; boardIndex < state.boardCount; boardIndex++) {
+        const slots = new Array(CARD_COUNT).fill(null);
+        const used = new Set();
+        const preferredPlacements = preferredPlacementsForBoard(boardIndex) || [];
+        const doubleId = boardDoubleIds[boardIndex] || null;
 
-            if (!candidates.length) {
-              candidates = ids.filter(id => !used.has(id));
-            }
+        if (doubleId) {
+          DOUBLE_POSITIONS.forEach((pos, index) => {
+            placeCard(slots, used, doubleId, pos, index > 0);
+          });
+        } else if (state.center) {
+          placeCard(slots, used, state.center, CENTER_POS);
+        }
 
-            const ordered = shuffle(candidates, random).sort((a, b) => (
-              state.forceAll
-                ? groupCounts.get(a) - groupCounts.get(b) || random() - .5
-                : random() - .5
-            ));
-
-            const card = ordered[0];
-            placeCard(slots, used, card, pos);
-          }
-
-          boards.push(slots);
+        preferredPlacements.forEach(({ id, pos }) => {
+          if (id === state.center || id === doubleId) return;
+          const targetPos = state.randomPrefPositions
+            ? randomOpenPosition(slots, new Set(DOUBLE_POSITIONS))
+            : pos;
+          placeCard(slots, used, id, targetPos);
         });
+
+        boardData.push({ slots, used });
       }
 
-      state.boards = boards;
+      boardData.forEach(({ slots, used }) => {
+        for (let pos = 0; pos < CARD_COUNT; pos++) {
+          if (slots[pos]) continue;
+
+          const card = balancedCard(slots, used);
+          placeCard(slots, used, card, pos);
+        }
+      });
+
+      state.boards = boardData.map(({ slots }) => slots);
     }
 
     function renderCenterSelect() {
@@ -1242,6 +1242,7 @@
       $("#sheet").style.setProperty("--sheet-bg", state.sheetColor);
       $("#sheet").style.setProperty("--panel-bg", state.sheetColor);
       $("#sheetColor").value = state.sheetColor;
+      $("#sideCardSize").value = state.sideCardSize;
       $("#cardShape").value = state.cardShape;
       $("#showCenterPanel").checked = state.showCenterPanel;
       $("#showPrefsPanel").checked = state.showPrefsPanel;
@@ -1252,16 +1253,48 @@
       document.body.dataset.cardShape = state.cardShape;
     }
 
-    function fitPreferredMiniCards() {
+    function fitSideMiniCards() {
+      const sheet = $("#sheet");
+      const side = $("#sidePanel");
+      const centerBox = $("#centerBox");
+      const prefsBox = $("#prefsBox");
       const list = $("#prefMini");
-      const count = Math.max(1, state.prefs.length);
-      const gap = 12;
-      const availableHeight = list.clientHeight || 0;
-      const availableWidth = list.clientWidth || 0;
-      const rowHeight = Math.max(0, (availableHeight - gap * (count - 1)) / count);
-      const cardWidth = Math.floor(Math.min(availableWidth, rowHeight * .75));
-      list.style.gridTemplateRows = `repeat(${count}, minmax(0, 1fr))`;
-      list.style.setProperty("--pref-size", `${Math.max(24, cardWidth)}px`);
+      const centerCount = state.showCenterPanel ? 1 : 0;
+      const prefCount = state.showPrefsPanel ? Math.max(1, state.prefs.length) : 0;
+      const visibleCardCount = centerCount + prefCount;
+
+      if (!visibleCardCount) return;
+
+      const gap = 8;
+      const sideStyles = getComputedStyle(side);
+      const sideGap = parseFloat(sideStyles.rowGap) || 0;
+      const sidePadding = (parseFloat(sideStyles.paddingTop) || 0) + (parseFloat(sideStyles.paddingBottom) || 0);
+      const countHeight = $(".count-panel").offsetHeight || 0;
+      const centerChrome = state.showCenterPanel
+        ? Math.max(0, centerBox.offsetHeight - ($("#centerMini").offsetHeight || 0))
+        : 0;
+      const prefsChrome = state.showPrefsPanel
+        ? Math.max(0, prefsBox.offsetHeight - list.offsetHeight)
+        : 0;
+      const visibleBoxes = 1 + Number(state.showCenterPanel) + Number(state.showPrefsPanel);
+      const usedGaps = sideGap * Math.max(0, visibleBoxes - 1);
+      const prefGaps = state.showPrefsPanel ? gap * Math.max(0, prefCount - 1) : 0;
+      const availableHeight = side.clientHeight - sidePadding - countHeight - centerChrome - prefsChrome - usedGaps - prefGaps;
+      const heightLimitedWidth = availableHeight > 0
+        ? (availableHeight / visibleCardCount) * .75
+        : state.sideCardSize;
+      const widthLimits = [side.clientWidth || Infinity];
+      if (state.showCenterPanel) widthLimits.push(centerBox.clientWidth || Infinity);
+      if (state.showPrefsPanel) widthLimits.push(prefsBox.clientWidth || Infinity);
+      const availableWidth = Math.min(...widthLimits);
+      const cardWidth = Math.floor(Math.min(state.sideCardSize, availableWidth, heightLimitedWidth));
+      const fittedSize = `${Math.max(28, cardWidth)}px`;
+
+      sheet.style.setProperty("--side-card-size", fittedSize);
+      if (state.showPrefsPanel) {
+        list.style.gridTemplateRows = `repeat(${prefCount}, auto)`;
+        list.style.setProperty("--pref-size", fittedSize);
+      }
     }
 
     function loadImage(src) {
@@ -1363,7 +1396,7 @@
       return new Map(entries);
     }
 
-    function drawMiniCard(context, img, rect, color) {
+    function drawMiniCard(context, img, rect) {
       roundedRectPath(context, rect.x, rect.y, rect.w, rect.h, 6);
       context.fillStyle = state.sheetColor;
       context.fill();
@@ -1373,7 +1406,7 @@
       drawImageContain(context, img, rect.x, rect.y, rect.w, rect.h);
       context.restore();
       context.lineWidth = 2;
-      context.strokeStyle = color;
+      context.strokeStyle = "#d9e0ec";
       context.stroke();
     }
 
@@ -1451,15 +1484,12 @@
           const boardRect = pixelRect(board, sheetRect);
           context.fillStyle = state.sheetColor;
           context.fillRect(boardRect.x, boardRect.y, boardRect.w, boardRect.h);
-          const preferredIds = new Set((preferredPlacementsForBoard(boardIndex) || []).map(item => item.id));
           const slots = state.boards[boardIndex];
 
           [...board.children].forEach((cell, pos) => {
             const id = slots[pos];
             const img = images.get(id);
             const rect = pixelRect(cell, sheetRect);
-            const isCenter = state.center && pos === CENTER_POS && id === state.center;
-            const isPreferred = preferredIds.has(id);
             const isDouble = state.doubleBoards && DOUBLE_POSITIONS.includes(pos) && slots[DOUBLE_POSITIONS[0]] === slots[DOUBLE_POSITIONS[1]];
             if (!img) return;
 
@@ -1473,9 +1503,9 @@
               context.clip();
               drawImageFill(context, img, x, y, size, size);
               context.restore();
-              if (isCenter || isPreferred || isDouble) {
+              if (isDouble) {
                 context.lineWidth = 4;
-                context.strokeStyle = isDouble ? "#0f9f9a" : (isPreferred ? "#d33f3f" : "#ffd84a");
+                context.strokeStyle = "#0f9f9a";
                 context.beginPath();
                 context.arc(x + size / 2, y + size / 2, size / 2 - 2, 0, Math.PI * 2);
                 context.stroke();
@@ -1487,9 +1517,9 @@
               context.clip();
               drawImageFill(context, img, rect.x, rect.y, rect.w, rect.h);
               context.restore();
-              if (isCenter || isPreferred || isDouble) {
+              if (isDouble) {
                 context.lineWidth = 4;
-                context.strokeStyle = isDouble ? "#0f9f9a" : (isPreferred ? "#d33f3f" : "#ffd84a");
+                context.strokeStyle = "#0f9f9a";
                 context.strokeRect(rect.x + 2, rect.y + 2, rect.w - 4, rect.h - 4);
               }
             }
@@ -1517,21 +1547,27 @@
       }
     }
 
+    function sidePanelWidth(showSide) {
+      if (!showSide) return 0;
+      return Math.round(Math.max(140, Math.min(300, state.sideCardSize + 82)));
+    }
+
     function renderSheet() {
       const { cols, rows } = boardGrid();
-      const boardGap = 8;
+      const boardGap = 4;
       const showSide = state.showCenterPanel || state.showPrefsPanel;
       $("#sheet").style.setProperty("--cols", cols);
       $("#sheet").style.setProperty("--rows", rows);
       $("#sheet").style.setProperty("--board-gap", `${boardGap}px`);
       applyTheme();
       $("#sheet").classList.toggle("no-side", !showSide);
-      const sideWidth = showSide ? 240 : 0;
-      const sideGap = showSide ? 8 : 0;
+      const sideWidth = sidePanelWidth(showSide);
+      const sideGap = showSide ? 4 : 0;
       const boardWidth = 240;
       const boardHeight = 320;
       const sheetWidth = sideWidth + sideGap + cols * boardWidth + (cols - 1) * boardGap;
       const sheetHeight = rows * boardHeight + (rows - 1) * boardGap;
+      $("#sheet").style.setProperty("--side-width", `${sideWidth}px`);
       $("#sheet").style.aspectRatio = `${sheetWidth} / ${sheetHeight}`;
       $("#countBadge").textContent = state.boardCount;
       $("#sidePanel").classList.toggle("hide-center", !state.showCenterPanel);
@@ -1545,7 +1581,7 @@
       $("#prefMini").innerHTML = state.prefs.length
         ? state.prefs.map(id => renderMiniCard(id, "pref-mark", "")).join("")
         : `<div class="mini-card">Sin preferidas</div>`;
-      if (state.showPrefsPanel) fitPreferredMiniCards();
+      fitSideMiniCards();
 
       $("#boards").innerHTML = state.boards.map((slots, boardIndex) => {
         const preferredIds = new Set((preferredPlacementsForBoard(boardIndex) || []).map(item => item.id));
@@ -1653,6 +1689,11 @@
       applyTheme();
     });
 
+    $("#sideCardSize").addEventListener("input", event => {
+      state.sideCardSize = Number(event.target.value) || 104;
+      renderSheet();
+    });
+
     $("#cardShape").addEventListener("change", event => {
       state.cardShape = event.target.value;
       renderSheet();
@@ -1727,7 +1768,7 @@
 
     $("#generateBtn").addEventListener("click", renderAll);
     $("#downloadBtn").addEventListener("click", downloadSheetPNG);
-    window.addEventListener("resize", fitPreferredMiniCards);
+    window.addEventListener("resize", fitSideMiniCards);
 
     renderDeckSelect();
     renderCenterSelect();
