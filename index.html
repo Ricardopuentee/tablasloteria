@@ -1671,14 +1671,23 @@
           button.textContent = `${index}/20`;
 
           if (original.doubleBoards) {
+            const prefCount = original.showPrefsPanel ? clampBatchPrefCount(original.batchPrefCount) : 0;
+            const fixedPrefs = original.prefs.slice(0, prefCount);
+            const randomPrefs = leastUsedIds(
+              Math.max(0, prefCount - fixedPrefs.length),
+              prefCounts,
+              new Set(fixedPrefs),
+              state.boardCount
+            );
             state.doubleBoards = true;
             state.randomDoubleCards = false;
             state.doubleSelectMode = false;
             state.center = null;
-            state.prefs = [];
+            state.prefs = [...fixedPrefs, ...randomPrefs];
+            state.repeatPrefs = prefCount > 0;
             state.showCenterPanel = false;
-            state.showPrefsPanel = false;
-            state.doubleIds = leastUsedIds(state.boardCount, doubleCounts);
+            state.showPrefsPanel = original.showPrefsPanel && prefCount > 0;
+            state.doubleIds = leastUsedIds(state.boardCount, doubleCounts, new Set(state.prefs));
           } else {
             const prefCount = original.showPrefsPanel ? clampBatchPrefCount(original.batchPrefCount) : 0;
             const useCenter = Boolean(original.showCenterPanel);
@@ -1689,7 +1698,14 @@
             state.repeatPrefs = prefCount > 0;
             state.showPrefsPanel = original.showPrefsPanel && prefCount > 0;
             state.showCenterPanel = useCenter;
-            state.prefs = leastUsedIds(prefCount, prefCounts, new Set(), state.boardCount);
+            const fixedPrefs = original.prefs.slice(0, prefCount);
+            const randomPrefs = leastUsedIds(
+              Math.max(0, prefCount - fixedPrefs.length),
+              prefCounts,
+              new Set(fixedPrefs),
+              state.boardCount
+            );
+            state.prefs = [...fixedPrefs, ...randomPrefs];
             state.center = useCenter
               ? leastUsedIds(1, centerCounts, new Set(state.prefs), state.boardCount)[0] || null
               : null;
