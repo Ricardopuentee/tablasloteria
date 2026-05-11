@@ -57,9 +57,14 @@
       border-radius: 16px;
       padding: 12px;
       display: grid;
-      grid-template-columns: 132px 132px minmax(180px, 1fr) 146px 118px 108px 108px 118px 118px 118px 146px 130px;
+      grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
       gap: 10px;
       align-items: end;
+    }
+
+    .field.wide,
+    .field.show-field {
+      grid-column: span 2;
     }
 
     .brand {
@@ -688,7 +693,7 @@
     }
 
     @media (max-width: 1180px) {
-      .toolbar { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .toolbar { grid-template-columns: repeat(4, minmax(118px, 1fr)); }
       .brand { grid-column: 1 / -1; }
       .main { grid-template-columns: 1fr; }
       .deck-panel { position: static; height: min(68dvh, 520px); max-height: min(68dvh, 520px); }
@@ -700,7 +705,7 @@
     @media (max-width: 680px) {
       .app { padding: 10px; }
       .toolbar { grid-template-columns: 1fr 1fr; }
-      .field.wide, .brand { grid-column: 1 / -1; }
+      .field.wide, .field.show-field, .brand { grid-column: 1 / -1; }
       .btn { padding: 0 8px; }
       .sheet-panel { padding: 8px; }
       .sheet { min-width: 680px; --side-width: 180px; }
@@ -748,7 +753,7 @@
         </div>
       </div>
 
-      <div class="field">
+      <div class="field show-field">
         <span>Mostrar</span>
         <div class="show-options">
           <label class="check-pill">
@@ -783,6 +788,11 @@
       <label class="field" for="sideCardSize">
         <span>Lateral</span>
         <input id="sideCardSize" type="range" min="48" max="180" value="104">
+      </label>
+
+      <label class="field" for="batchPrefCount">
+        <span>Prefs/20</span>
+        <input id="batchPrefCount" type="number" min="0" max="4" value="4">
       </label>
 
       <button class="btn" id="clearBtn" type="button">Limpiar</button>
@@ -918,6 +928,7 @@
       boardFrameColor: "#000000",
       sideCardSize: 104,
       cardShape: "rectangle",
+      batchPrefCount: 4,
       boards: []
     };
 
@@ -972,6 +983,10 @@
 
     function clampBoards(value) {
       return Math.max(1, Math.min(30, Number(value) || 1));
+    }
+
+    function clampBatchPrefCount(value) {
+      return Math.max(0, Math.min(4, Number(value) || 0));
     }
 
     function boardGrid() {
@@ -1425,8 +1440,8 @@
       const sheet = $("#sheet");
       const sheetRect = sheet.getBoundingClientRect();
       const sheetStyles = getComputedStyle(sheet);
-      const width = Math.ceil(sheetRect.width);
-      const height = Math.ceil(sheetRect.height);
+      const width = Math.ceil(Math.max(sheetRect.width, sheet.scrollWidth));
+      const height = Math.ceil(Math.max(sheetRect.height, sheet.scrollHeight));
       const scale = 2;
       const allIds = [
         state.center,
@@ -1609,13 +1624,13 @@
       return new Map(ids.map(id => [id, 0]));
     }
 
-    function leastUsedIds(count, counts, blocked = new Set()) {
+    function leastUsedIds(count, counts, blocked = new Set(), weight = 1) {
       const candidates = FIGURAS
         .map(fig => fig.id)
         .filter(id => !blocked.has(id))
         .sort((a, b) => counts.get(a) - counts.get(b) || Math.random() - .5);
       const picked = candidates.slice(0, count);
-      picked.forEach(id => counts.set(id, counts.get(id) + 1));
+      picked.forEach(id => counts.set(id, counts.get(id) + weight));
       return picked;
     }
 
@@ -1656,15 +1671,19 @@
             state.showPrefsPanel = false;
             state.doubleIds = leastUsedIds(state.boardCount, doubleCounts);
           } else {
-            const prefCount = 1 + Math.floor(Math.random() * 4);
+            const prefCount = original.showPrefsPanel ? clampBatchPrefCount(original.batchPrefCount) : 0;
+            const useCenter = Boolean(original.showCenterPanel);
             state.doubleBoards = false;
             state.randomDoubleCards = true;
             state.doubleSelectMode = false;
             state.doubleIds = [];
-            state.showCenterPanel = true;
-            state.showPrefsPanel = true;
-            state.prefs = leastUsedIds(prefCount, prefCounts);
-            state.center = leastUsedIds(1, centerCounts, new Set(state.prefs))[0] || null;
+            state.repeatPrefs = prefCount > 0;
+            state.showPrefsPanel = original.showPrefsPanel && prefCount > 0;
+            state.showCenterPanel = useCenter;
+            state.prefs = leastUsedIds(prefCount, prefCounts, new Set(), state.boardCount);
+            state.center = useCenter
+              ? leastUsedIds(1, centerCounts, new Set(state.prefs), state.boardCount)[0] || null
+              : null;
           }
 
           renderAll();
@@ -1756,6 +1775,7 @@
       $("#prefStatus").textContent = `${state.prefs.length} de 4${state.repeatPrefs ? ", en todas" : ", por bloque"}${state.randomPrefPositions ? ", aleatorias" : ""}`;
       $("#doubleStatus").textContent = state.doubleBoards ? doubleStatus : "Apagadas";
       $("#boardCount").value = state.boardCount;
+      $("#batchPrefCount").value = state.batchPrefCount;
     }
 
     function renderAll() {
@@ -1812,6 +1832,11 @@
     $("#boardCount").addEventListener("change", event => {
       state.boardCount = clampBoards(event.target.value);
       renderAll();
+    });
+
+    $("#batchPrefCount").addEventListener("change", event => {
+      state.batchPrefCount = clampBatchPrefCount(event.target.value);
+      renderStatus();
     });
 
     $("#centerSelect").addEventListener("change", event => {
