@@ -891,6 +891,7 @@
 
     const DECKS = [
       { id: "clasico", label: "Clasica", type: "classic" },
+      { id: "carpeta-sin-titulo", label: "carpeta sin titulo", type: "classic" },
       { id: "nino", label: "Baraja Nino", type: "numbered", folder: "Baraja Niño", ext: "jpeg" },
       { id: "animada", label: "Animada original", type: "whatsapp", folder: "baraja animada", date: "2026-04-28", specs: [["17.42.07",1,1],["17.42.08",0,1],["17.42.09",1,1],["17.42.10",0,1],["17.42.11",0,1],["17.42.12",0,1],["17.42.13",1,1],["17.42.14",0,1],["17.42.15",0,1],["17.42.16",0,1],["17.42.17",0,1],["17.42.18",0,1],["17.42.20",0,1],["17.42.21",1,1],["17.42.23",0,1],["17.42.24",0,1],["17.42.25",0,1],["17.42.26",0,1],["17.42.27",0,1],["17.42.28",0,1],["17.42.29",0,1],["17.42.30",0,1],["17.42.31",0,1],["17.42.32",0,1],["17.42.33",0,1],["17.42.34",0,1],["17.42.35",0,1],["17.42.36",0,1],["17.42.37",0,1],["17.42.38",1,1],["17.42.40",1,1],["17.42.41",0,1],["17.42.42",0,1],["17.42.43",0,1],["17.42.44",0,1],["17.42.45",1,1],["17.42.46",0,1],["17.42.47",0,1],["17.42.48",0,1],["17.42.49",0,1],["17.42.50",0,1],["17.42.51",1,1],["17.42.52",0,1],["17.42.53",0,1],["17.42.54",1,1]] },
       { id: "animada2", label: "Animada 2", type: "whatsapp", folder: "Baraja Animada 2", date: "2026-05-04", specs: [["14.31.22",1,1],["14.31.23",4,1],["14.31.24",4,1],["14.31.25",4,1],["14.31.26",3,1],["14.31.27",3,1],["14.31.28",4,1],["14.31.29",4,1],["14.31.30",6,1],["14.31.31",4,1],["14.31.32",2,1],["14.31.33",3,1]] },
@@ -902,7 +903,14 @@
       { id: "trebol", label: "Trebol", type: "whatsapp", folder: "Baraja trebol", date: "2026-05-04", specs: [["14.30.42",4,1],["14.30.43",2,1],["14.30.44",2,1],["14.30.45",1,1],["14.30.46",1,1],["14.30.47",0,1],["14.30.48",2,1],["14.30.49",1,1],["14.30.50",2,1],["14.30.51",1,1],["14.30.52",1,1],["14.30.53",1,1],["14.30.54",1,1],["14.30.55",4,1],["14.30.56",4,1],["14.30.57",4,1],["14.30.58",4,1],["14.30.59",1,1]] },
       { id: "galaxy", label: "Galaxy", type: "whatsapp", folder: "Galaxyy", date: "2026-05-04", specs: [["16.36.19",9,1],["16.36.20",11,1],["16.36.21",10,1],["16.36.22",12,1],["16.36.23",7,1]] },
       { id: "mario", label: "Mario Bros", type: "whatsapp", folder: "Baraja Mario Bros", date: "2026-05-06", specs: [["18.40.03",0,1],["18.40.04",12,1],["18.40.05",12,1],["18.40.06",11,1],["18.40.07",11,1],["18.40.08",2,1]] },
-      { id: "piolin", label: "Piolin", type: "whatsapp", folder: "Baraja Piolin", date: "2026-05-06", specs: [["18.39.52",0,1],["18.39.53",13,1],["18.39.54",12,1],["18.39.55",13,1],["18.39.56",11,1]] }
+      { id: "piolin", label: "Piolin", type: "whatsapp", folder: "Baraja Piolin", date: "2026-05-06", specs: [["18.39.52",0,1],["18.39.53",13,1],["18.39.54",12,1],["18.39.55",13,1],["18.39.56",11,1]] },
+      { id: "ojitos", label: "Ojitos bonitos", type: "whatsapp", folder: "Animada ojitos bonitos", date: "2026-04-26", specs: [["5.00.20 PM",10,1],["5.00.21 PM",12,1],["5.00.22 PM",13,1],["5.00.23 PM",8,1],["5.00.24 PM",6,1]] },
+      { id: "chavo2", label: "El Chavo animada 2", type: "whatsapp", folder: "el chavo animada 2", date: "2026-05-08", specs: [["1.27.39 PM",2,1],["1.27.40 PM",1,1],["1.27.44 PM",5,1],["1.27.45 PM",4,1],["1.27.46 PM",0,1],["1.27.56 PM",1,1],["1.27.57 PM",10,1],["1.27.58 PM",10,1],["1.27.59 PM",9,1],["1.28.00 PM",2,1]] },
+      { id: "gorditos", label: "Gorditos", type: "whatsapp", folder: "Gorditos", date: "2026-04-25", specs: [["12.36.47 AM",0,1],["12.36.48 AM",0,1],["12.36.49 AM",1,1],["12.36.50 AM",1,1],["12.36.51 AM",0,1],["12.36.52 AM",1,1],["12.36.53 AM",2,1],["12.36.54 AM",0,1],["12.36.55 AM",1,1],["12.36.59 AM",1,1],["12.37.00 AM",1,1],["12.37.01 AM",1,1],["12.37.02 AM",1,1],["12.37.03 AM",2,1],["12.37.04 AM",1,1],["12.37.05 AM",1,1],["12.37.06 AM",0,1],["12.37.07 AM",2,1],["12.37.08 AM",1,1],["12.37.09 AM",2,1],["12.37.10 AM",3,1],["12.37.11 AM",2,1],["12.37.12 AM",0,1],["12.37.13 AM",0,1],["12.37.14 AM",1,1],["12.37.15 AM",2,1],["12.37.16 AM",0,1]] },
+      { id: "minecraft", label: "Minecraft", type: "whatsapp", folder: "Minecraft", date: "2026-05-08", specs: [["10.56.52 AM",2,1],["10.56.53 AM",12,1],["10.56.54 AM",12,1],["10.56.55 AM",14,1],["10.56.56 AM",9,1]] },
+      { id: "ositos", label: "Ositos Carinosos", type: "whatsapp", folder: "Ositos Cariñosos", date: "2026-05-08", specs: [["10.53.01 AM",4,1],["10.53.02 AM",14,1],["10.53.03 AM",12,1],["10.53.04 AM",12,1],["10.53.05 AM",5,1]] },
+      { id: "shinepink", label: "Shine Pink", type: "whatsapp", folder: "shine pink", date: "2026-04-20", extraFiles: ["2e5eb048-702f-4bd1-b534-ba136addbf2a.jpg","8c123975-3571-4f57-94bb-f4daffd8e0f5.jpg","61ec4a40-36fd-4547-bc45-b347503ceac9.jpg","613b2c9a-2c44-4d13-972c-1a9bbcebcce4.jpg","adc8116e-18b1-4b87-9f4e-1e53914a9538.jpg","b8a41140-92fd-47c4-b9a3-ac8099b9f4a9.jpg"], specs: [["12.17.29 AM",0,1],["12.17.30 AM",3,1],["12.17.34 AM",0,1],["12.17.35 AM",9,1],["12.17.36 AM",11,1],["12.17.37 AM",10,1],["12.17.38 AM",5,1],["12.17.39 AM",2,1]] },
+      { id: "unknown426", label: "WhatsApp 26 abril", type: "whatsapp", folder: "WhatsApp Unknown 2026-04-26 at 5_3", date: "2026-04-26", specs: [["5.00.20 PM",10,1],["5.00.21 PM",12,1],["5.00.22 PM",13,1],["5.00.23 PM",8,1],["5.00.24 PM",6,1]] }
     ];
 
     const CARD_COUNT = 16;
@@ -946,7 +954,7 @@
 
     function whatsAppFiles(deck) {
       if (deck.files) return deck.files;
-      deck.files = deck.specs.flatMap(([time, copies, hasPlain]) => {
+      const generatedFiles = deck.specs.flatMap(([time, copies, hasPlain]) => {
         const files = [];
         for (let index = 1; index <= copies; index++) {
           files.push(`WhatsApp Image ${deck.date} at ${time} (${index}).jpeg`);
@@ -954,6 +962,7 @@
         if (hasPlain) files.push(`WhatsApp Image ${deck.date} at ${time}.jpeg`);
         return files;
       });
+      deck.files = [...(deck.extraFiles || []), ...generatedFiles];
       return deck.files;
     }
 
@@ -992,7 +1001,7 @@
     function boardGrid() {
       const count = state.boardCount;
       if (count <= 1) return { cols: 1, rows: 1 };
-      if (count <= 4) return { cols: 2, rows: 2 };
+      if (count <= 5) return { cols: count, rows: 1 };
       if (count <= 10) return { cols: Math.ceil(count / 2), rows: 2 };
       if (count <= 12) return { cols: 4, rows: 3 };
       if (count <= 18) return { cols: Math.ceil(count / 3), rows: 3 };
