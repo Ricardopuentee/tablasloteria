@@ -315,6 +315,8 @@
       --side-card-size: 104px;
       --frame-size: 4px;
       --board-gap: 6px;
+      --board-cells: 4;
+      --board-ratio: 3 / 4;
       --sheet-bg: #101828;
       --panel-bg: var(--sheet-bg);
       --board-frame-color: #000000;
@@ -453,11 +455,11 @@
 
     .board {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      grid-template-rows: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(var(--board-cells), minmax(0, 1fr));
+      grid-template-rows: repeat(var(--board-cells), minmax(0, 1fr));
       column-gap: 1px;
       row-gap: 1px;
-      aspect-ratio: 3 / 4;
+      aspect-ratio: var(--board-ratio);
       background: var(--board-frame-color);
       border: 5px solid var(--board-frame-color);
       min-width: 0;
@@ -744,6 +746,22 @@
         <input id="boardCount" type="number" min="1" max="30" value="12">
       </label>
 
+      <label class="field" for="boardSize">
+        <span>Tipo</span>
+        <select id="boardSize">
+          <option value="4">4x4 cartas</option>
+          <option value="5">5x5 figuritas</option>
+        </select>
+      </label>
+
+      <label class="field" for="fourBoardLayout">
+        <span>4 tablas</span>
+        <select id="fourBoardLayout">
+          <option value="grid">2 y 2</option>
+          <option value="row">Horizontal</option>
+        </select>
+      </label>
+
       <div class="field wide">
         <span>Centro opcional</span>
         <select class="visually-hidden" id="centerSelect" tabindex="-1" aria-hidden="true"></select>
@@ -910,17 +928,23 @@
       { id: "minecraft", label: "Minecraft", type: "whatsapp", folder: "Minecraft", date: "2026-05-08", specs: [["10.56.52 AM",2,1],["10.56.53 AM",12,1],["10.56.54 AM",12,1],["10.56.55 AM",14,1],["10.56.56 AM",9,1]] },
       { id: "ositos", label: "Ositos Carinosos", type: "whatsapp", folder: "Ositos Cariñosos", date: "2026-05-08", specs: [["10.53.01 AM",4,1],["10.53.02 AM",14,1],["10.53.03 AM",12,1],["10.53.04 AM",12,1],["10.53.05 AM",5,1]] },
       { id: "shinepink", label: "Shine Pink", type: "whatsapp", folder: "shine pink", date: "2026-04-20", extraFiles: ["2e5eb048-702f-4bd1-b534-ba136addbf2a.jpg","8c123975-3571-4f57-94bb-f4daffd8e0f5.jpg","61ec4a40-36fd-4547-bc45-b347503ceac9.jpg","613b2c9a-2c44-4d13-972c-1a9bbcebcce4.jpg","adc8116e-18b1-4b87-9f4e-1e53914a9538.jpg","b8a41140-92fd-47c4-b9a3-ac8099b9f4a9.jpg"], specs: [["12.17.29 AM",0,1],["12.17.30 AM",3,1],["12.17.34 AM",0,1],["12.17.35 AM",9,1],["12.17.36 AM",11,1],["12.17.37 AM",10,1],["12.17.38 AM",5,1],["12.17.39 AM",2,1]] },
-      { id: "unknown426", label: "WhatsApp 26 abril", type: "whatsapp", folder: "WhatsApp Unknown 2026-04-26 at 5_3", date: "2026-04-26", specs: [["5.00.20 PM",10,1],["5.00.21 PM",12,1],["5.00.22 PM",13,1],["5.00.23 PM",8,1],["5.00.24 PM",6,1]] }
+      { id: "unknown426", label: "WhatsApp 26 abril", type: "whatsapp", folder: "WhatsApp Unknown 2026-04-26 at 5_3", date: "2026-04-26", specs: [["5.00.20 PM",10,1],["5.00.21 PM",12,1],["5.00.22 PM",13,1],["5.00.23 PM",8,1],["5.00.24 PM",6,1]] },
+      { id: "animadas4", label: "Animadas 4", type: "whatsapp", folder: "animadas 4", date: "2026-05-12", specs: [["14.30.49",1,1],["14.30.50",6,1],["14.30.51",7,1],["14.30.52",6,1],["14.30.53",0,1],["14.30.55",2,1],["14.30.56",7,1],["14.30.57",9,1],["14.30.58",7,1]] },
+      { id: "caricatura-colorida", label: "Caricatura Colorida", type: "whatsapp", folder: "Caricatura Colorida", date: "2026-05-12", specs: [["14.29.28",0,1],["14.29.29",1,1],["14.29.30",5,1],["14.29.31",4,1],["14.29.32",6,1],["14.29.33",6,1],["14.29.34",7,1],["14.29.35",6,1],["14.29.36",6,1],["14.29.37",3,1]] },
+      { id: "glitter", label: "Glitter", type: "whatsapp", folder: "Glitter", date: "2026-05-12", specs: [["14.30.22",2,1],["14.30.25",5,1],["14.30.26",4,1],["14.30.36",6,1],["14.30.37",5,1],["14.30.38",5,1],["14.30.39",2,1],["14.30.42",1,1],["14.30.43",5,1],["14.30.48",4,1],["14.30.49",4,1]] },
+      { id: "gordinflones", label: "Gordinflones", type: "whatsapp", folder: "Gordinflones", date: "2026-05-12", specs: [["14.29.38",0,1],["14.29.42",1,1],["14.29.43",3,1],["14.29.44",3,1],["14.29.45",4,1],["14.29.55",0,1],["14.30.04",2,1],["14.30.05",6,1],["14.30.06",0,1],["14.30.09",3,1],["14.30.10",1,1],["14.30.11",3,1],["14.30.14",3,1],["14.30.15",4,1],["14.30.16",4,1],["14.30.22",1,1]] }
     ];
 
-    const CARD_COUNT = 16;
     const CENTER_POS = 5;
     const DOUBLE_POSITIONS = [5, 6];
-    const PREF_POSITIONS = [0, 3, 12, 15];
+    const PREF_POSITIONS_4X4 = [0, 3, 12, 15];
+    const PREF_POSITIONS_5X5 = [0, 4, 20, 24];
 
     const state = {
       deck: "clasico",
       boardCount: 12,
+      boardSize: 4,
+      fourBoardLayout: "grid",
       center: null,
       prefs: [],
       repeatPrefs: false,
@@ -994,15 +1018,37 @@
       return Math.max(1, Math.min(30, Number(value) || 1));
     }
 
+    function clampBoardSize(value) {
+      return Number(value) === 5 ? 5 : 4;
+    }
+
+    function clampFourBoardLayout(value) {
+      return value === "row" ? "row" : "grid";
+    }
+
     function clampBatchPrefCount(value) {
       return Math.max(0, Math.min(4, Number(value) || 0));
+    }
+
+    function cardCount() {
+      return state.boardSize * state.boardSize;
+    }
+
+    function usesClassicRules() {
+      return state.boardSize === 4;
+    }
+
+    function prefPositions() {
+      return usesClassicRules() ? PREF_POSITIONS_4X4 : PREF_POSITIONS_5X5;
     }
 
     function boardGrid() {
       const count = state.boardCount;
       if (count <= 1) return { cols: 1, rows: 1 };
       if (count <= 3) return { cols: count, rows: 1 };
-      if (count === 4) return { cols: 2, rows: 2 };
+      if (count === 4) return state.fourBoardLayout === "row"
+        ? { cols: 4, rows: 1 }
+        : { cols: 2, rows: 2 };
       if (count === 5) return { cols: 5, rows: 1 };
       if (count <= 10) return { cols: Math.ceil(count / 2), rows: 2 };
       if (count <= 12) return { cols: 4, rows: 3 };
@@ -1046,8 +1092,18 @@
     }
 
     function sanitizeState() {
+      state.boardSize = clampBoardSize(state.boardSize);
+      state.fourBoardLayout = clampFourBoardLayout(state.fourBoardLayout);
       state.prefs = uniqueValidIds(state.prefs).slice(0, 4);
       state.doubleIds = uniqueValidIds(state.doubleIds);
+
+      if (!usesClassicRules()) {
+        state.center = null;
+        state.doubleIds = [];
+        state.doubleBoards = false;
+        state.doubleSelectMode = false;
+        state.showCenterPanel = false;
+      }
 
       if (state.doubleBoards) {
         state.center = null;
@@ -1071,14 +1127,14 @@
 
     function randomOpenPosition(slots, blocked = new Set()) {
       const positions = [];
-      for (let pos = 0; pos < CARD_COUNT; pos++) {
+      for (let pos = 0; pos < cardCount(); pos++) {
         if (!slots[pos] && !blocked.has(pos)) positions.push(pos);
       }
       return positions[Math.floor(Math.random() * positions.length)];
     }
 
     function doubleIdsForBoards(ids, random) {
-      if (!state.doubleBoards) return [];
+      if (!usesClassicRules() || !state.doubleBoards) return [];
 
       const preferredIds = new Set(state.prefs);
       const usableIds = ids.filter(id => !preferredIds.has(id));
@@ -1098,10 +1154,11 @@
 
     function preferredPlacementsForBoard(boardIndex) {
       if (!state.prefs.length) return null;
+      const positions = prefPositions();
       if (state.repeatPrefs) {
         return state.prefs.map((id, index) => ({
           id,
-          pos: PREF_POSITIONS[index]
+          pos: positions[index]
         }));
       }
 
@@ -1109,7 +1166,7 @@
       if (groupPosition >= state.prefs.length) return [];
       return [{
         id: state.prefs[groupPosition],
-        pos: PREF_POSITIONS[groupPosition]
+        pos: positions[groupPosition]
       }];
     }
 
@@ -1150,7 +1207,7 @@
       };
 
       for (let boardIndex = 0; boardIndex < state.boardCount; boardIndex++) {
-        const slots = new Array(CARD_COUNT).fill(null);
+        const slots = new Array(cardCount()).fill(null);
         const used = new Set();
         const preferredPlacements = preferredPlacementsForBoard(boardIndex) || [];
         const doubleId = boardDoubleIds[boardIndex] || null;
@@ -1166,7 +1223,7 @@
         preferredPlacements.forEach(({ id, pos }) => {
           if (id === state.center || id === doubleId) return;
           const targetPos = state.randomPrefPositions
-            ? randomOpenPosition(slots, new Set(DOUBLE_POSITIONS))
+            ? randomOpenPosition(slots, usesClassicRules() ? new Set(DOUBLE_POSITIONS) : new Set())
             : pos;
           placeCard(slots, used, id, targetPos);
         });
@@ -1175,7 +1232,7 @@
       }
 
       boardData.forEach(({ slots, used }) => {
-        for (let pos = 0; pos < CARD_COUNT; pos++) {
+        for (let pos = 0; pos < cardCount(); pos++) {
           if (slots[pos]) continue;
 
           const card = balancedCard(slots, used);
@@ -1256,6 +1313,10 @@
     }
 
     function selectCenter(value) {
+      if (!usesClassicRules()) {
+        showToast("Centro no aplica en tablas 5x5.");
+        return;
+      }
       state.center = value ? Number(value) : null;
       if (state.center) {
         state.doubleBoards = false;
@@ -1281,12 +1342,20 @@
       $("#boardFrameColor").value = state.boardFrameColor;
       $("#sideCardSize").value = state.sideCardSize;
       $("#cardShape").value = state.cardShape;
+      $("#boardSize").value = state.boardSize;
+      $("#fourBoardLayout").value = state.fourBoardLayout;
+      $("#fourBoardLayout").disabled = state.boardCount !== 4;
       $("#showCenterPanel").checked = state.showCenterPanel;
+      $("#showCenterPanel").disabled = !usesClassicRules();
       $("#showPrefsPanel").checked = state.showPrefsPanel;
       $("#repeatPrefs").checked = state.repeatPrefs;
       $("#randomPrefPositions").checked = state.randomPrefPositions;
       $("#doubleBoards").checked = state.doubleBoards;
+      $("#doubleBoards").disabled = !usesClassicRules();
       $("#randomDoubleCards").checked = state.randomDoubleCards;
+      $("#randomDoubleCards").disabled = !usesClassicRules();
+      $("#centerSelect").disabled = !usesClassicRules();
+      $("#centerTrigger").disabled = !usesClassicRules();
       document.body.dataset.cardShape = state.cardShape;
     }
 
@@ -1524,7 +1593,7 @@
             const id = slots[pos];
             const img = images.get(id);
             const rect = pixelRect(cell, sheetRect);
-            const isDouble = state.doubleBoards && DOUBLE_POSITIONS.includes(pos) && slots[DOUBLE_POSITIONS[0]] === slots[DOUBLE_POSITIONS[1]];
+            const isDouble = usesClassicRules() && state.doubleBoards && DOUBLE_POSITIONS.includes(pos) && slots[DOUBLE_POSITIONS[0]] === slots[DOUBLE_POSITIONS[1]];
             if (!img) return;
 
             if (state.cardShape === "circle") {
@@ -1748,16 +1817,19 @@
       const frameSize = 4;
       const boardGap = 6;
       const showSide = state.showCenterPanel || state.showPrefsPanel;
+      const boardCells = state.boardSize;
       $("#sheet").style.setProperty("--cols", cols);
       $("#sheet").style.setProperty("--rows", rows);
+      $("#sheet").style.setProperty("--board-cells", boardCells);
+      $("#sheet").style.setProperty("--board-ratio", usesClassicRules() ? "3 / 4" : "1 / 1");
       $("#sheet").style.setProperty("--board-gap", `${boardGap}px`);
       $("#sheet").style.setProperty("--frame-size", `${frameSize}px`);
       applyTheme();
       $("#sheet").classList.toggle("no-side", !showSide);
       const sideWidth = sidePanelWidth(showSide);
       const sideGap = showSide ? frameSize : 0;
-      const boardWidth = 240;
-      const boardHeight = 320;
+      const boardWidth = usesClassicRules() ? 240 : 280;
+      const boardHeight = usesClassicRules() ? 320 : 280;
       const sheetWidth = frameSize * 2 + sideWidth + sideGap + cols * boardWidth + (cols - 1) * boardGap;
       const sheetHeight = frameSize * 2 + rows * boardHeight + (rows - 1) * boardGap;
       $("#sheet").style.setProperty("--side-width", `${sideWidth}px`);
@@ -1779,10 +1851,10 @@
       $("#boards").innerHTML = state.boards.map((slots, boardIndex) => {
         const preferredIds = new Set((preferredPlacementsForBoard(boardIndex) || []).map(item => item.id));
         const cells = slots.map((id, pos) => {
-          const isDouble = state.doubleBoards && DOUBLE_POSITIONS.includes(pos) && slots[DOUBLE_POSITIONS[0]] === slots[DOUBLE_POSITIONS[1]];
+          const isDouble = usesClassicRules() && state.doubleBoards && DOUBLE_POSITIONS.includes(pos) && slots[DOUBLE_POSITIONS[0]] === slots[DOUBLE_POSITIONS[1]];
           const classes = [
             "cell",
-            state.center && pos === CENTER_POS && id === state.center ? "center" : "",
+            usesClassicRules() && state.center && pos === CENTER_POS && id === state.center ? "center" : "",
             preferredIds.has(id) ? "preferred" : "",
             isDouble ? "double" : ""
           ].filter(Boolean).join(" ");
@@ -1794,14 +1866,19 @@
     }
 
     function renderStatus() {
-      const center = state.doubleBoards ? "Usando tablas dobles" : (state.center ? fallbackText(state.center) : "Sin centro");
+      const center = !usesClassicRules()
+        ? "No aplica en 5x5"
+        : (state.doubleBoards ? "Usando tablas dobles" : (state.center ? fallbackText(state.center) : "Sin centro"));
       const doubleStatus = state.randomDoubleCards
         ? "Aleatorios"
         : `${state.doubleIds.length} seleccionada${state.doubleIds.length === 1 ? "" : "s"}`;
       $("#centerStatus").textContent = center;
       $("#prefStatus").textContent = `${state.prefs.length} de 4${state.repeatPrefs ? ", en todas" : ", por bloque"}${state.randomPrefPositions ? ", aleatorias" : ""}`;
-      $("#doubleStatus").textContent = state.doubleBoards ? doubleStatus : "Apagadas";
+      $("#doubleStatus").textContent = !usesClassicRules() ? "No aplican en 5x5" : (state.doubleBoards ? doubleStatus : "Apagadas");
       $("#boardCount").value = state.boardCount;
+      $("#boardSize").value = state.boardSize;
+      $("#fourBoardLayout").value = state.fourBoardLayout;
+      $("#fourBoardLayout").disabled = state.boardCount !== 4;
       $("#batchPrefCount").value = state.batchPrefCount;
     }
 
@@ -1816,6 +1893,10 @@
     }
 
     function toggleDoubleCard(id) {
+      if (!usesClassicRules()) {
+        showToast("Dobles no aplica en tablas 5x5.");
+        return;
+      }
       if (state.doubleIds.includes(id)) {
         state.doubleIds = state.doubleIds.filter(doubleId => doubleId !== id);
       } else {
@@ -1861,6 +1942,23 @@
       renderAll();
     });
 
+    $("#boardSize").addEventListener("change", event => {
+      state.boardSize = clampBoardSize(event.target.value);
+      if (!usesClassicRules()) {
+        state.center = null;
+        state.doubleIds = [];
+        state.doubleBoards = false;
+        state.doubleSelectMode = false;
+        state.showCenterPanel = false;
+      }
+      renderAll();
+    });
+
+    $("#fourBoardLayout").addEventListener("change", event => {
+      state.fourBoardLayout = clampFourBoardLayout(event.target.value);
+      renderAll();
+    });
+
     $("#batchPrefCount").addEventListener("change", event => {
       state.batchPrefCount = clampBatchPrefCount(event.target.value);
       renderStatus();
@@ -1871,6 +1969,10 @@
     });
 
     $("#centerTrigger").addEventListener("click", () => {
+      if (!usesClassicRules()) {
+        showToast("Centro no aplica en tablas 5x5.");
+        return;
+      }
       const isOpen = $("#centerPicker").hasAttribute("open");
       setCenterPickerOpen(!isOpen);
     });
@@ -1904,6 +2006,11 @@
     });
 
     $("#showCenterPanel").addEventListener("change", event => {
+      if (!usesClassicRules()) {
+        state.showCenterPanel = false;
+        renderAll();
+        return;
+      }
       state.showCenterPanel = event.target.checked;
       if (state.showCenterPanel && state.doubleBoards) {
         state.doubleBoards = false;
@@ -1933,6 +2040,12 @@
     });
 
     $("#doubleBoards").addEventListener("change", event => {
+      if (!usesClassicRules()) {
+        state.doubleBoards = false;
+        state.doubleSelectMode = false;
+        renderAll();
+        return;
+      }
       state.doubleBoards = event.target.checked;
       if (state.doubleBoards) {
         state.center = null;
@@ -1944,6 +2057,15 @@
     });
 
     $("#randomDoubleCards").addEventListener("change", event => {
+      if (!usesClassicRules()) {
+        state.randomDoubleCards = event.target.checked;
+        state.doubleIds = [];
+        state.doubleBoards = false;
+        state.doubleSelectMode = false;
+        renderAll();
+        showToast("Dobles no aplica en tablas 5x5.");
+        return;
+      }
       state.randomDoubleCards = event.target.checked;
       state.doubleBoards = true;
       state.center = null;
