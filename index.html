@@ -910,7 +910,7 @@
     const DECKS = [
       { id: "clasico", label: "Clasica", type: "classic" },
       { id: "carpeta-sin-titulo", label: "carpeta sin titulo", type: "classic" },
-      { id: "nino", label: "Baraja Nino", type: "numbered", folder: "Baraja Niño", ext: "jpeg" },
+      { id: "nino", label: "Baraja Nino", type: "numbered", folder: "Baraja Nino", ext: "jpeg" },
       { id: "animada", label: "Animada original", type: "whatsapp", folder: "baraja animada", date: "2026-04-28", specs: [["17.42.07",1,1],["17.42.08",0,1],["17.42.09",1,1],["17.42.10",0,1],["17.42.11",0,1],["17.42.12",0,1],["17.42.13",1,1],["17.42.14",0,1],["17.42.15",0,1],["17.42.16",0,1],["17.42.17",0,1],["17.42.18",0,1],["17.42.20",0,1],["17.42.21",1,1],["17.42.23",0,1],["17.42.24",0,1],["17.42.25",0,1],["17.42.26",0,1],["17.42.27",0,1],["17.42.28",0,1],["17.42.29",0,1],["17.42.30",0,1],["17.42.31",0,1],["17.42.32",0,1],["17.42.33",0,1],["17.42.34",0,1],["17.42.35",0,1],["17.42.36",0,1],["17.42.37",0,1],["17.42.38",1,1],["17.42.40",1,1],["17.42.41",0,1],["17.42.42",0,1],["17.42.43",0,1],["17.42.44",0,1],["17.42.45",1,1],["17.42.46",0,1],["17.42.47",0,1],["17.42.48",0,1],["17.42.49",0,1],["17.42.50",0,1],["17.42.51",1,1],["17.42.52",0,1],["17.42.53",0,1],["17.42.54",1,1]] },
       { id: "animada2", label: "Animada 2", type: "whatsapp", folder: "Baraja Animada 2", date: "2026-05-04", specs: [["14.31.22",1,1],["14.31.23",4,1],["14.31.24",4,1],["14.31.25",4,1],["14.31.26",3,1],["14.31.27",3,1],["14.31.28",4,1],["14.31.29",4,1],["14.31.30",6,1],["14.31.31",4,1],["14.31.32",2,1],["14.31.33",3,1]] },
       { id: "animado3", label: "Animado 3", type: "whatsapp", folder: "Animado 3", date: "2026-05-04", specs: [["14.59.45",1,1],["14.59.46",1,1],["14.59.47",5,1],["14.59.48",4,1],["14.59.49",4,1],["14.59.50",4,1],["14.59.51",4,1],["14.59.52",4,1],["14.59.53",3,1],["14.59.54",0,1],["14.59.55",4,1],["14.59.56",4,1],["14.59.57",3,1]] },
@@ -966,10 +966,14 @@
 
     const $ = selector => document.querySelector(selector);
 
+    function assetPath(...parts) {
+      return parts.map(part => encodeURIComponent(part)).join("/");
+    }
+
     function classicPath(id) {
       return id <= 15
-        ? `carpeta sin titulo/Imagen ${id}.png`
-        : `carpeta sin titulo/${id}.png`;
+        ? assetPath("carpeta sin titulo", `Imagen ${id}.png`)
+        : assetPath("carpeta sin titulo", `${id}.png`);
     }
 
     function deckById(id) {
@@ -993,10 +997,10 @@
     function imageFor(id) {
       const deck = deckById(state.deck);
       if (deck.type === "classic") return classicPath(id);
-      if (deck.type === "numbered") return `${deck.folder}/${id}.${deck.ext}`;
+      if (deck.type === "numbered") return assetPath(deck.folder, `${id}.${deck.ext}`);
       if (deck.type === "whatsapp") {
         const file = whatsAppFiles(deck)[id - 1];
-        return file ? `${deck.folder}/${encodeURIComponent(file)}` : classicPath(id);
+        return file ? assetPath(deck.folder, file) : classicPath(id);
       }
       return classicPath(id);
     }
