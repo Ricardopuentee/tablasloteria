@@ -926,7 +926,7 @@
       { id: "chavo2", label: "El Chavo animada 2", type: "whatsapp", folder: "el chavo animada 2", date: "2026-05-08", specs: [["1.27.39 PM",2,1],["1.27.40 PM",1,1],["1.27.44 PM",5,1],["1.27.45 PM",4,1],["1.27.46 PM",0,1],["1.27.56 PM",1,1],["1.27.57 PM",10,1],["1.27.58 PM",10,1],["1.27.59 PM",9,1],["1.28.00 PM",2,1]] },
       { id: "gorditos", label: "Gorditos", type: "whatsapp", folder: "Gorditos", date: "2026-04-25", specs: [["12.36.47 AM",0,1],["12.36.48 AM",0,1],["12.36.49 AM",1,1],["12.36.50 AM",1,1],["12.36.51 AM",0,1],["12.36.52 AM",1,1],["12.36.53 AM",2,1],["12.36.54 AM",0,1],["12.36.55 AM",1,1],["12.36.59 AM",1,1],["12.37.00 AM",1,1],["12.37.01 AM",1,1],["12.37.02 AM",1,1],["12.37.03 AM",2,1],["12.37.04 AM",1,1],["12.37.05 AM",1,1],["12.37.06 AM",0,1],["12.37.07 AM",2,1],["12.37.08 AM",1,1],["12.37.09 AM",2,1],["12.37.10 AM",3,1],["12.37.11 AM",2,1],["12.37.12 AM",0,1],["12.37.13 AM",0,1],["12.37.14 AM",1,1],["12.37.15 AM",2,1],["12.37.16 AM",0,1]] },
       { id: "minecraft", label: "Minecraft", type: "whatsapp", folder: "Minecraft", date: "2026-05-08", specs: [["10.56.52 AM",2,1],["10.56.53 AM",12,1],["10.56.54 AM",12,1],["10.56.55 AM",14,1],["10.56.56 AM",9,1]] },
-      { id: "ositos", label: "Ositos Carinosos", type: "whatsapp", folder: "Ositos Cariñosos", date: "2026-05-08", specs: [["10.53.01 AM",4,1],["10.53.02 AM",14,1],["10.53.03 AM",12,1],["10.53.04 AM",12,1],["10.53.05 AM",5,1]] },
+      { id: "ositos", label: "Ositos Cariñosos", type: "whatsapp", folder: "Ositos Carinosos", date: "2026-05-08", specs: [["10.53.01 AM",4,1],["10.53.02 AM",14,1],["10.53.03 AM",12,1],["10.53.04 AM",12,1],["10.53.05 AM",5,1]] },
       { id: "shinepink", label: "Shine Pink", type: "whatsapp", folder: "shine pink", date: "2026-04-20", extraFiles: ["2e5eb048-702f-4bd1-b534-ba136addbf2a.jpg","8c123975-3571-4f57-94bb-f4daffd8e0f5.jpg","61ec4a40-36fd-4547-bc45-b347503ceac9.jpg","613b2c9a-2c44-4d13-972c-1a9bbcebcce4.jpg","adc8116e-18b1-4b87-9f4e-1e53914a9538.jpg","b8a41140-92fd-47c4-b9a3-ac8099b9f4a9.jpg"], specs: [["12.17.29 AM",0,1],["12.17.30 AM",3,1],["12.17.34 AM",0,1],["12.17.35 AM",9,1],["12.17.36 AM",11,1],["12.17.37 AM",10,1],["12.17.38 AM",5,1],["12.17.39 AM",2,1]] },
       { id: "unknown426", label: "WhatsApp 26 abril", type: "whatsapp", folder: "WhatsApp Unknown 2026-04-26 at 5_3", date: "2026-04-26", specs: [["5.00.20 PM",10,1],["5.00.21 PM",12,1],["5.00.22 PM",13,1],["5.00.23 PM",8,1],["5.00.24 PM",6,1]] },
       { id: "animadas4", label: "Animadas 4", type: "whatsapp", folder: "animadas 4", date: "2026-05-12", specs: [["14.30.49",1,1],["14.30.50",6,1],["14.30.51",7,1],["14.30.52",6,1],["14.30.53",0,1],["14.30.55",2,1],["14.30.56",7,1],["14.30.57",9,1],["14.30.58",7,1]] },
@@ -1007,7 +1007,8 @@
       if (deck.type === "classic") return classicPath(id);
       if (deck.type === "numbered") return assetPath(deck.folder, `${id}.${deck.ext}`);
       if (deck.type === "whatsapp") {
-        const file = whatsAppFiles(deck)[id - 1];
+        const files = whatsAppFiles(deck);
+        const file = files.length ? files[(id - 1) % files.length] : null;
         return file ? assetPath(deck.folder, file) : classicPath(id);
       }
       return classicPath(id);
