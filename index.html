@@ -533,11 +533,12 @@
       position: sticky;
       top: 12px;
       border-radius: 18px;
-      height: calc(100dvh - 28px);
-      max-height: calc(100dvh - 28px);
+      height: calc(100svh - 28px);
+      max-height: calc(100svh - 28px);
       overflow-x: hidden;
       overflow-y: auto;
       overscroll-behavior: contain;
+      scroll-padding-bottom: 112px;
       -webkit-overflow-scrolling: touch;
       display: block;
       touch-action: pan-y;
@@ -639,7 +640,7 @@
       align-content: start;
       align-items: start;
       min-height: 0;
-      padding-bottom: 18px;
+      padding-bottom: max(112px, env(safe-area-inset-bottom));
     }
 
     .card-tile {
@@ -711,7 +712,7 @@
       .toolbar { grid-template-columns: repeat(4, minmax(118px, 1fr)); }
       .brand { grid-column: 1 / -1; }
       .main { grid-template-columns: 1fr; }
-      .deck-panel { position: static; height: min(68dvh, 520px); max-height: min(68dvh, 520px); }
+      .deck-panel { position: static; height: min(68svh, 520px); max-height: min(68svh, 520px); }
       .cards { height: auto; max-height: none; }
       .sheet { min-width: 720px; }
       .center-menu { grid-template-columns: repeat(5, minmax(0, 1fr)); }
