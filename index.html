@@ -294,6 +294,18 @@
       color: white;
     }
 
+    .btn.danger {
+      color: #b42318;
+      border-color: #f1b5ae;
+      background: #fff7f6;
+    }
+
+    .btn:disabled {
+      cursor: not-allowed;
+      opacity: .48;
+      transform: none;
+    }
+
     .main {
       display: grid;
       grid-template-columns: minmax(0, 1fr) clamp(290px, 23vw, 370px);
@@ -320,6 +332,7 @@
       --sheet-bg: #101828;
       --panel-bg: var(--sheet-bg);
       --board-frame-color: #000000;
+      --card-bg: #ffffff;
       width: 100%;
       min-width: 760px;
       aspect-ratio: 1170 / 972;
@@ -413,7 +426,7 @@
     .cell,
     .card-tile {
       overflow: hidden;
-      background: white;
+      background: var(--card-bg);
     }
 
     .mini-card {
@@ -638,7 +651,7 @@
       width: 100%;
       height: auto;
       position: relative;
-      background: #f8fafc;
+      background: var(--card-bg);
       touch-action: pan-y;
     }
 
@@ -814,6 +827,9 @@
       </label>
 
       <button class="btn" id="clearBtn" type="button">Limpiar</button>
+      <button class="btn" id="addDeckBtn" type="button">Agregar baraja</button>
+      <button class="btn danger" id="deleteDeckBtn" type="button">Eliminar baraja</button>
+      <input class="visually-hidden" id="deckFolderInput" type="file" accept="image/*" webkitdirectory directory multiple>
       <button class="btn" id="shuffleBtn" type="button">Mezclar</button>
       <button class="btn" id="generateBtn" type="button">Generar</button>
       <button class="btn primary" id="downloadBtn" type="button">Descargar PNG</button>
@@ -911,7 +927,15 @@
       { id: "clasico", label: "Clasica", type: "classic" },
       { id: "carpeta-sin-titulo", label: "carpeta sin titulo", type: "classic" },
       { id: "nino", label: "Baraja Nino", type: "numbered", folder: "Baraja Nino", ext: "jpeg" },
+      { id: "sin-fondo-tradicional", label: "Sin fondo tradicional", type: "whatsapp", folder: "Sin fondo baraja tradicional", files: [
+        "Picsart_24-11-06_16-41-41-505.png","Picsart_24-11-06_16-42-19-839.png","Picsart_24-11-06_16-43-17-277.png","Picsart_24-11-06_16-43-58-594.png","Picsart_24-11-06_16-44-33-048.png","Picsart_24-11-06_16-45-07-085.png","Picsart_24-11-06_16-46-02-220.png","Picsart_24-11-06_16-47-16-465.png","Picsart_24-11-06_16-47-47-059.png","Picsart_24-11-06_16-48-16-342.png","Picsart_24-11-06_16-48-58-837.png","Picsart_24-11-06_16-49-32-396.png","Picsart_24-11-06_16-50-38-328.png","Picsart_24-11-06_16-51-10-116.png","Picsart_24-11-06_16-51-48-319.png","Picsart_24-11-06_16-52-17-992.png","Picsart_24-11-06_16-52-47-183.png","Picsart_24-11-06_16-55-48-933.png","Picsart_24-11-06_16-58-34-044.png","Picsart_24-11-06_16-59-21-540.png","Picsart_24-11-06_17-00-01-489.png","Picsart_24-11-06_17-01-50-156.png","Picsart_24-11-06_17-02-40-072.png","Picsart_24-11-06_17-05-50-591.png","Picsart_24-11-06_17-06-30-676.png","Picsart_24-11-06_17-07-02-402.png","Picsart_24-11-06_17-07-37-254.png","Picsart_24-11-06_17-08-14-317.png","Picsart_24-11-06_17-09-12-301.png","Picsart_24-11-06_17-09-37-469.png","Picsart_24-11-06_17-10-14-272.png","Picsart_24-11-06_17-10-48-403.png","Picsart_24-11-06_17-11-29-021.png","Picsart_24-11-06_17-12-01-898.png","Picsart_24-11-06_17-12-39-821.png","Picsart_24-11-06_17-13-17-378.png","Picsart_24-11-06_17-13-46-199.png","Picsart_24-11-06_17-14-15-526.png","Picsart_24-11-06_17-14-46-209.png","Picsart_24-11-06_17-15-58-971.png","Picsart_24-11-06_17-16-36-386.png","Picsart_25-07-07_22-53-07-533.png","Picsart_26-02-18_11-45-52-669.png","Picsart_26-02-18_11-48-28-159.png","Picsart_26-02-18_11-49-18-857.png","Picsart_26-02-18_11-51-00-652.png","Picsart_26-02-18_11-51-45-693.png","Picsart_26-02-18_11-53-45-068.png","Picsart_26-02-18_11-55-13-972.png","Picsart_26-02-18_11-56-26-271.png","Picsart_26-02-18_11-58-22-998.png","Picsart_26-02-18_12-00-11-026.png","Picsart_26-02-18_12-00-47-010.png","Picsart_26-02-18_12-02-24-941.png"
+      ] },
       { id: "animada", label: "Animada original", type: "whatsapp", folder: "baraja animada", date: "2026-04-28", specs: [["17.42.07",1,1],["17.42.08",0,1],["17.42.09",1,1],["17.42.10",0,1],["17.42.11",0,1],["17.42.12",0,1],["17.42.13",1,1],["17.42.14",0,1],["17.42.15",0,1],["17.42.16",0,1],["17.42.17",0,1],["17.42.18",0,1],["17.42.20",0,1],["17.42.21",1,1],["17.42.23",0,1],["17.42.24",0,1],["17.42.25",0,1],["17.42.26",0,1],["17.42.27",0,1],["17.42.28",0,1],["17.42.29",0,1],["17.42.30",0,1],["17.42.31",0,1],["17.42.32",0,1],["17.42.33",0,1],["17.42.34",0,1],["17.42.35",0,1],["17.42.36",0,1],["17.42.37",0,1],["17.42.38",1,1],["17.42.40",1,1],["17.42.41",0,1],["17.42.42",0,1],["17.42.43",0,1],["17.42.44",0,1],["17.42.45",1,1],["17.42.46",0,1],["17.42.47",0,1],["17.42.48",0,1],["17.42.49",0,1],["17.42.50",0,1],["17.42.51",1,1],["17.42.52",0,1],["17.42.53",0,1],["17.42.54",1,1]] },
+      { id: "animada-sin-fondo", label: "Animada sin fondo", type: "whatsapp", folder: "Animada sin fondo", files: Array.from({ length: 54 }, (_, index) => {
+        const number = String(index + 318).padStart(4, "0");
+        const names = { "0340": "IMG-20260505-WA0340 (1).png", "0361": "IMG-20260505-WA0361(1).png", "0370": "IMG-20260505-WA0370 (1).png" };
+        return names[number] || `IMG-20260505-WA${number}.png`;
+      }) },
       { id: "animada2", label: "Animada 2", type: "whatsapp", folder: "Baraja Animada 2", date: "2026-05-04", specs: [["14.31.22",1,1],["14.31.23",4,1],["14.31.24",4,1],["14.31.25",4,1],["14.31.26",3,1],["14.31.27",3,1],["14.31.28",4,1],["14.31.29",4,1],["14.31.30",6,1],["14.31.31",4,1],["14.31.32",2,1],["14.31.33",3,1]] },
       { id: "animado3", label: "Animado 3", type: "whatsapp", folder: "Animado 3", date: "2026-05-04", specs: [["14.59.45",1,1],["14.59.46",1,1],["14.59.47",5,1],["14.59.48",4,1],["14.59.49",4,1],["14.59.50",4,1],["14.59.51",4,1],["14.59.52",4,1],["14.59.53",3,1],["14.59.54",0,1],["14.59.55",4,1],["14.59.56",4,1],["14.59.57",3,1]] },
       { id: "colores", label: "Colores bonitos", type: "whatsapp", folder: "Animada colores bonitos", date: "2026-05-04", specs: [["15.39.38",4,1],["15.39.39",10,1],["15.39.40",12,1],["15.39.41",12,1],["15.39.42",11,1]] },
@@ -925,6 +949,13 @@
       { id: "ojitos", label: "Ojitos bonitos", type: "whatsapp", folder: "Animada ojitos bonitos", date: "2026-04-26", specs: [["5.00.20 PM",10,1],["5.00.21 PM",12,1],["5.00.22 PM",13,1],["5.00.23 PM",8,1],["5.00.24 PM",6,1]] },
       { id: "chavo2", label: "El Chavo animada 2", type: "whatsapp", folder: "el chavo animada 2", date: "2026-05-08", specs: [["1.27.39 PM",2,1],["1.27.40 PM",1,1],["1.27.44 PM",5,1],["1.27.45 PM",4,1],["1.27.46 PM",0,1],["1.27.56 PM",1,1],["1.27.57 PM",10,1],["1.27.58 PM",10,1],["1.27.59 PM",9,1],["1.28.00 PM",2,1]] },
       { id: "gorditos", label: "Gorditos", type: "whatsapp", folder: "Gorditos", date: "2026-04-25", specs: [["12.36.47 AM",0,1],["12.36.48 AM",0,1],["12.36.49 AM",1,1],["12.36.50 AM",1,1],["12.36.51 AM",0,1],["12.36.52 AM",1,1],["12.36.53 AM",2,1],["12.36.54 AM",0,1],["12.36.55 AM",1,1],["12.36.59 AM",1,1],["12.37.00 AM",1,1],["12.37.01 AM",1,1],["12.37.02 AM",1,1],["12.37.03 AM",2,1],["12.37.04 AM",1,1],["12.37.05 AM",1,1],["12.37.06 AM",0,1],["12.37.07 AM",2,1],["12.37.08 AM",1,1],["12.37.09 AM",2,1],["12.37.10 AM",3,1],["12.37.11 AM",2,1],["12.37.12 AM",0,1],["12.37.13 AM",0,1],["12.37.14 AM",1,1],["12.37.15 AM",2,1],["12.37.16 AM",0,1]] },
+      { id: "gorditos-sin-fondo", label: "Gorditos sin fondo", type: "whatsapp", folder: "Gorditos sin fondo", files: Array.from({ length: 54 }, (_, index) => {
+        const number = String(index + 2).padStart(4, "0");
+        return number === "0051" ? "IMG-20260425-WA0051 (1).png" : `IMG-20260425-WA${number}.png`;
+      }) },
+      { id: "crochet", label: "Crochet", type: "whatsapp", folder: "Crochet", files: [
+        "PHOTO-2026-05-19-11-35-35.jpg","PHOTO-2026-05-19-11-35-36.jpg","PHOTO-2026-05-19-11-35-37.jpg","PHOTO-2026-05-19-11-35-39.jpg","PHOTO-2026-05-19-11-35-40.jpg","PHOTO-2026-05-19-11-35-41.jpg","PHOTO-2026-05-19-11-35-42.jpg","PHOTO-2026-05-19-11-35-43.jpg","PHOTO-2026-05-19-11-35-44 2.jpg","PHOTO-2026-05-19-11-35-44.jpg","PHOTO-2026-05-19-11-35-45 2.jpg","PHOTO-2026-05-19-11-35-45 3.jpg","PHOTO-2026-05-19-11-35-45.jpg","PHOTO-2026-05-19-11-35-46 2.jpg","PHOTO-2026-05-19-11-35-46 3.jpg","PHOTO-2026-05-19-11-35-46.jpg","PHOTO-2026-05-19-11-35-47 2.jpg","PHOTO-2026-05-19-11-35-47.jpg","PHOTO-2026-05-19-11-35-48 2.jpg","PHOTO-2026-05-19-11-35-48 3.jpg","PHOTO-2026-05-19-11-35-48.jpg","PHOTO-2026-05-19-11-35-49 2.jpg","PHOTO-2026-05-19-11-35-49.jpg","PHOTO-2026-05-19-11-35-50 2.jpg","PHOTO-2026-05-19-11-35-50.jpg","PHOTO-2026-05-19-11-35-51 2.jpg","PHOTO-2026-05-19-11-35-51.jpg","PHOTO-2026-05-19-11-35-52 2.jpg","PHOTO-2026-05-19-11-35-52.jpg","PHOTO-2026-05-19-11-35-53 2.jpg","PHOTO-2026-05-19-11-35-53 3.jpg","PHOTO-2026-05-19-11-35-53.jpg","PHOTO-2026-05-19-11-35-54.jpg","PHOTO-2026-05-19-11-35-55 2.jpg","PHOTO-2026-05-19-11-35-55.jpg","PHOTO-2026-05-19-11-35-56.jpg","PHOTO-2026-05-19-11-35-57.jpg","PHOTO-2026-05-19-11-35-58.jpg","PHOTO-2026-05-19-11-35-59.jpg","PHOTO-2026-05-19-11-36-18 2.jpg","PHOTO-2026-05-19-11-36-18 3.jpg","PHOTO-2026-05-19-11-36-18 4.jpg","PHOTO-2026-05-19-11-36-18.jpg","PHOTO-2026-05-19-11-36-19 2.jpg","PHOTO-2026-05-19-11-36-19 3.jpg","PHOTO-2026-05-19-11-36-19.jpg","PHOTO-2026-05-19-11-36-20 2.jpg","PHOTO-2026-05-19-11-36-20 3.jpg","PHOTO-2026-05-19-11-36-20.jpg","PHOTO-2026-05-19-11-36-21 2.jpg","PHOTO-2026-05-19-11-36-21 3.jpg","PHOTO-2026-05-19-11-36-21 4.jpg","PHOTO-2026-05-19-11-36-21.jpg","PHOTO-2026-05-19-11-36-22.jpg"
+      ] },
       { id: "minecraft", label: "Minecraft", type: "whatsapp", folder: "Minecraft", date: "2026-05-08", specs: [["10.56.52 AM",2,1],["10.56.53 AM",12,1],["10.56.54 AM",12,1],["10.56.55 AM",14,1],["10.56.56 AM",9,1]] },
       { id: "ositos", label: "Ositos Cariñosos", type: "whatsapp", folder: "Ositos Carinosos", date: "2026-05-08", specs: [["10.53.01 AM",4,1],["10.53.02 AM",14,1],["10.53.03 AM",12,1],["10.53.04 AM",12,1],["10.53.05 AM",5,1]] },
       { id: "shinepink", label: "Shine Pink", type: "whatsapp", folder: "shine pink", date: "2026-04-20", extraFiles: ["2e5eb048-702f-4bd1-b534-ba136addbf2a.jpg","8c123975-3571-4f57-94bb-f4daffd8e0f5.jpg","61ec4a40-36fd-4547-bc45-b347503ceac9.jpg","613b2c9a-2c44-4d13-972c-1a9bbcebcce4.jpg","adc8116e-18b1-4b87-9f4e-1e53914a9538.jpg","b8a41140-92fd-47c4-b9a3-ac8099b9f4a9.jpg"], specs: [["12.17.29 AM",0,1],["12.17.30 AM",3,1],["12.17.34 AM",0,1],["12.17.35 AM",9,1],["12.17.36 AM",11,1],["12.17.37 AM",10,1],["12.17.38 AM",5,1],["12.17.39 AM",2,1]] },
@@ -937,10 +968,15 @@
       { id: "monitos-gorditos", label: "Monitos gorditos", type: "whatsapp", folder: "monitos gorditos", date: "2026-04-28", ext: "jpg", specs: [["8.29.07 PM",4,1],["8.29.08 PM",8,1],["8.29.09 PM",4,1],["8.29.10 PM",10,1],["8.29.11 PM",6,1],["8.29.12 PM",2,1],["8.29.13 PM",4,1],["8.29.14 PM",8,1]] },
       { id: "bonitoss", label: "Bonitoss", type: "whatsapp", folder: "bonitoss", date: "2026-04-28", ext: "jpg", specs: [["8.29.00 PM",1,1],["8.29.01 PM",8,1],["8.29.02 PM",6,1],["8.29.03 PM",2,1],["8.29.04 PM",8,1],["8.29.05 PM",6,1],["8.29.06 PM",2,1],["8.29.07 PM",3,1],["8.29.11 PM",2,1],["8.29.12 PM",3,1],["8.29.13 PM",2,1]] },
       { id: "mexicana-cash", label: "Mexicana cash", type: "whatsapp", folder: "mexicana cash", date: "2026-04-28", ext: "jpg", specs: [["8.29.15 PM",7,1],["8.29.16 PM",6,1],["8.29.17 PM",5,1],["8.29.18 PM",5,1],["8.29.19 PM",5,1],["8.29.20 PM",7,1],["8.29.21 PM",5,1],["8.29.22 PM",6,1]] },
-      { id: "mexicana-tarot", label: "Mexicana tipo tarot", type: "whatsapp", folder: "mexicana tipo tarot", date: "2026-04-28", ext: "jpg", specs: [["8.29.23 PM",5,1],["8.29.24 PM",6,1],["8.29.25 PM",6,1],["8.29.27 PM",5,1],["8.29.28 PM",5,1],["8.29.29 PM",1,1],["8.29.30 PM",5,1],["8.29.31 PM",7,1],["8.29.32 PM",5,0],["8.29.33 PM",0,1]] },
-      { id: "badbunny", label: "Loteria Badbunny", type: "whatsapp", folder: "Loteria Badbunny", files: ["1.jpg","2.jpg","3.jpg","4.jpg","5.jpg","6.jpg","7.jpg","8.jpg","9.jpg","10.jpg","11.jpg","12.jpg","13.jpg","14.jpg","15.jpg","16.jpg","17.jpg","18.jpg","19.jpg","20.jpg","21.jpg","22.jpg","23.jpg","24.jpg","25.jpg","26.jpg","27.jpg","28.jpg","29.jpg","30.jpg","31.jpg","32.jpg","33.jpg","34.jpg","35.jpg","36.jpg","37.jpg","38.jpg","41.jpg","42.jpg","44.jpg","45.jpg","46.jpg","47.jpg","48.jpg","49.jpg","50.jpg","51.jpg","52.jpg","53.jpg","54.jpg","WhatsApp Image 2026-05-15 at 13.22.39.jpeg","WhatsApp Image 2026-05-15 at 13.22.39 (1).jpeg","WhatsApp Image 2026-05-15 at 13.22.39 (2).jpeg"] },
-      { id: "boricua", label: "Loteria boricua", type: "numbered", folder: "Loteria boricua", ext: "jpg" }
+      { id: "mexicana-tarot", label: "Mexicana tipo tarot", type: "whatsapp", folder: "mexicana tipo tarot", date: "2026-04-28", ext: "jpg", specs: [["8.29.23 PM",5,1],["8.29.24 PM",6,1],["8.29.25 PM",6,1],["8.29.27 PM",5,1],["8.29.28 PM",5,1],["8.29.29 PM",1,1],["8.29.30 PM",5,1],["8.29.31 PM",7,1],["8.29.32 PM",5,0],["8.29.33 PM",0,1]] }
     ];
+
+    const CUSTOM_DECK_DB = "pozito-custom-decks";
+    const CUSTOM_DECK_STORE = "decks";
+    const CUSTOM_DECK_PREFIX = "custom:";
+    const IMAGE_FILE_PATTERN = /\.(avif|bmp|gif|jpe?g|png|webp)$/i;
+    const CUSTOM_DECKS = [];
+    const fileNameSorter = new Intl.Collator("es", { numeric: true, sensitivity: "base" });
 
     const CENTER_POS = 5;
     const DOUBLE_POSITIONS = [5, 6];
@@ -983,8 +1019,19 @@
         : assetPath("carpeta sin titulo", `${id}.png`);
     }
 
+    function allDecks() {
+      return [...DECKS, ...CUSTOM_DECKS];
+    }
+
     function deckById(id) {
-      return DECKS.find(deck => deck.id === id) || DECKS[0];
+      return allDecks().find(deck => deck.id === id) || DECKS[0];
+    }
+
+    function currentDeckUsesTransparentCards() {
+      const deck = deckById(state.deck);
+      return [deck.id, deck.label, deck.folder]
+        .filter(Boolean)
+        .some(value => String(value).toLowerCase().includes("sin fondo"));
     }
 
     function whatsAppFiles(deck) {
@@ -1010,6 +1057,10 @@
         const files = whatsAppFiles(deck);
         const file = files.length ? files[(id - 1) % files.length] : null;
         return file ? assetPath(deck.folder, file) : classicPath(id);
+      }
+      if (deck.type === "custom") {
+        const src = deck.urls[(id - 1) % deck.urls.length];
+        return src || classicPath(id);
       }
       return classicPath(id);
     }
@@ -1072,6 +1123,172 @@
 
     function showToast(message) {
       $("#toast").textContent = message || "";
+    }
+
+    function supportsCustomDecks() {
+      return "indexedDB" in window && "URL" in window && "createObjectURL" in URL;
+    }
+
+    function dbRequest(request) {
+      return new Promise((resolve, reject) => {
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    function openCustomDeckDB() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open(CUSTOM_DECK_DB, 1);
+        request.onupgradeneeded = () => {
+          const db = request.result;
+          if (!db.objectStoreNames.contains(CUSTOM_DECK_STORE)) {
+            db.createObjectStore(CUSTOM_DECK_STORE, { keyPath: "id" });
+          }
+        };
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    async function customDeckTransaction(mode, callback) {
+      const db = await openCustomDeckDB();
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction(CUSTOM_DECK_STORE, mode);
+        const store = transaction.objectStore(CUSTOM_DECK_STORE);
+        let result;
+        transaction.oncomplete = () => {
+          db.close();
+          resolve(result);
+        };
+        transaction.onerror = () => {
+          db.close();
+          reject(transaction.error);
+        };
+        result = callback(store);
+      });
+    }
+
+    function runtimeCustomDeck(record) {
+      const urls = record.files.map(file => URL.createObjectURL(file.blob));
+      return {
+        id: record.id,
+        label: record.label,
+        type: "custom",
+        custom: true,
+        urls,
+        _objectUrls: urls
+      };
+    }
+
+    function revokeCustomDeck(deck) {
+      (deck._objectUrls || []).forEach(url => URL.revokeObjectURL(url));
+    }
+
+    async function loadCustomDecks() {
+      if (!supportsCustomDecks()) return;
+      const records = await customDeckTransaction("readonly", store => dbRequest(store.getAll()));
+      records
+        .sort((a, b) => fileNameSorter.compare(a.label, b.label))
+        .forEach(record => CUSTOM_DECKS.push(runtimeCustomDeck(record)));
+    }
+
+    async function saveCustomDeckRecord(record) {
+      await customDeckTransaction("readwrite", store => store.put(record));
+    }
+
+    async function deleteCustomDeckRecord(id) {
+      await customDeckTransaction("readwrite", store => store.delete(id));
+    }
+
+    function folderNameFromFiles(files) {
+      const relativePath = files[0]?.webkitRelativePath || "";
+      return relativePath.split("/")[0] || "Baraja nueva";
+    }
+
+    function imageFilesFromSelection(fileList) {
+      return Array.from(fileList)
+        .filter(file => file.type.startsWith("image/") || IMAGE_FILE_PATTERN.test(file.name))
+        .sort((a, b) => {
+          const pathA = a.webkitRelativePath || a.name;
+          const pathB = b.webkitRelativePath || b.name;
+          return fileNameSorter.compare(pathA, pathB);
+        });
+    }
+
+    function canvasToBlob(canvas, type = "image/jpeg", quality = .9) {
+      return new Promise(resolve => canvas.toBlob(resolve, type, quality));
+    }
+
+    async function storedCustomDeckBlob(file) {
+      const url = URL.createObjectURL(file);
+      try {
+        const image = await loadImage(url);
+        const fitted = downscaleImage(image, 1400);
+        if (fitted instanceof HTMLCanvasElement) {
+          return await canvasToBlob(fitted, file.type === "image/png" ? "image/png" : "image/jpeg", .9) || file;
+        }
+        return file;
+      } finally {
+        URL.revokeObjectURL(url);
+      }
+    }
+
+    async function addCustomDeckFromFiles(fileList) {
+      if (!supportsCustomDecks()) {
+        showToast("Esta opcion necesita un navegador moderno para guardar barajas.");
+        return;
+      }
+
+      const imageFiles = imageFilesFromSelection(fileList);
+      if (imageFiles.length < 54) {
+        showToast(`La carpeta debe tener al menos 54 imagenes. Encontré ${imageFiles.length}.`);
+        return;
+      }
+
+      const folderName = folderNameFromFiles(imageFiles);
+      const label = (window.prompt("Nombre de la baraja:", folderName) || "").trim();
+      if (!label) return;
+
+      const selectedFiles = imageFiles.slice(0, 54);
+      showToast("Guardando baraja...");
+      const record = {
+        id: `${CUSTOM_DECK_PREFIX}${Date.now()}`,
+        label,
+        createdAt: new Date().toISOString(),
+        files: await Promise.all(selectedFiles.map(async file => ({
+          name: file.name,
+          type: file.type || "image/jpeg",
+          blob: await storedCustomDeckBlob(file)
+        })))
+      };
+
+      await saveCustomDeckRecord(record);
+      const deck = runtimeCustomDeck(record);
+      CUSTOM_DECKS.push(deck);
+      CUSTOM_DECKS.sort((a, b) => fileNameSorter.compare(a.label, b.label));
+      state.deck = deck.id;
+      renderDeckSelect();
+      renderAll();
+      showToast(`Baraja "${label}" guardada con 54 cartas.`);
+    }
+
+    async function deleteCurrentCustomDeck() {
+      const deck = deckById(state.deck);
+      if (!deck.custom) {
+        showToast("Solo puedes eliminar barajas agregadas por el cliente.");
+        return;
+      }
+
+      if (!window.confirm(`Eliminar la baraja "${deck.label}" de esta app?`)) return;
+
+      await deleteCustomDeckRecord(deck.id);
+      revokeCustomDeck(deck);
+      const index = CUSTOM_DECKS.findIndex(item => item.id === deck.id);
+      if (index >= 0) CUSTOM_DECKS.splice(index, 1);
+      state.deck = "clasico";
+      renderDeckSelect();
+      renderAll();
+      showToast(`Baraja "${deck.label}" eliminada.`);
     }
 
     function safeText(text) {
@@ -1266,9 +1483,16 @@
     }
 
     function renderDeckSelect() {
-      $("#deckSelect").innerHTML = DECKS.map(deck => (
+      const defaultOptions = DECKS.map(deck => (
         `<option value="${deck.id}">${safeText(deck.label)}</option>`
       )).join("");
+      const customOptions = CUSTOM_DECKS.map(deck => (
+        `<option value="${deck.id}">${safeText(deck.label)}</option>`
+      )).join("");
+      $("#deckSelect").innerHTML = customOptions
+        ? `<optgroup label="Incluidas">${defaultOptions}</optgroup><optgroup label="Agregadas">${customOptions}</optgroup>`
+        : defaultOptions;
+      if (!allDecks().some(deck => deck.id === state.deck)) state.deck = "clasico";
       $("#deckSelect").value = state.deck;
     }
 
@@ -1351,6 +1575,7 @@
       $("#sheet").style.setProperty("--sheet-bg", state.sheetColor);
       $("#sheet").style.setProperty("--panel-bg", state.sheetColor);
       $("#sheet").style.setProperty("--board-frame-color", state.boardFrameColor);
+      $("#sheet").style.setProperty("--card-bg", currentDeckUsesTransparentCards() ? "var(--sheet-bg)" : "#ffffff");
       $("#sheetColor").value = state.sheetColor;
       $("#boardFrameColor").value = state.boardFrameColor;
       $("#sideCardSize").value = state.sideCardSize;
@@ -1581,6 +1806,7 @@
         context.fillRect(0, 0, width, height);
 
         const sideVisible = state.showCenterPanel || state.showPrefsPanel;
+        const transparentCards = currentDeckUsesTransparentCards();
         if (sideVisible) {
           const countRect = relativeRect($(".count-panel"), sheetRect);
           drawCenteredText(context, String(state.boardCount), countRect.x + countRect.w / 2, countRect.y + countRect.h / 2 - 11, Math.min(64, countRect.w * .38));
@@ -1652,6 +1878,8 @@
                 context.stroke();
               }
             } else {
+              context.fillStyle = transparentCards ? state.sheetColor : "#ffffff";
+              context.fillRect(rect.x, rect.y, rect.w, rect.h);
               context.save();
               context.beginPath();
               context.rect(rect.x, rect.y, rect.w, rect.h);
@@ -1913,6 +2141,7 @@
       $("#fourBoardLayout").value = state.fourBoardLayout;
       $("#fourBoardLayout").disabled = state.boardCount !== 4;
       $("#batchPrefCount").value = state.batchPrefCount;
+      $("#deleteDeckBtn").disabled = !deckById(state.deck).custom;
     }
 
     function renderAll() {
@@ -1968,6 +2197,29 @@
     $("#deckSelect").addEventListener("change", event => {
       state.deck = event.target.value;
       renderAll();
+    });
+
+    $("#addDeckBtn").addEventListener("click", () => {
+      $("#deckFolderInput").value = "";
+      $("#deckFolderInput").click();
+    });
+
+    $("#deckFolderInput").addEventListener("change", async event => {
+      try {
+        await addCustomDeckFromFiles(event.target.files);
+      } catch (error) {
+        console.error(error);
+        showToast("No se pudo guardar la baraja. Prueba con imagenes mas ligeras.");
+      }
+    });
+
+    $("#deleteDeckBtn").addEventListener("click", async () => {
+      try {
+        await deleteCurrentCustomDeck();
+      } catch (error) {
+        console.error(error);
+        showToast("No se pudo eliminar la baraja.");
+      }
     });
 
     $("#boardCount").addEventListener("change", event => {
@@ -2130,9 +2382,24 @@
     $("#batchBtn").addEventListener("click", downloadBatchPNGs);
     window.addEventListener("resize", fitSideMiniCards);
 
-    renderDeckSelect();
-    renderCenterSelect();
-    renderAll();
+    async function initApp() {
+      try {
+        await loadCustomDecks();
+      } catch (error) {
+        console.error(error);
+      }
+
+      renderDeckSelect();
+      renderCenterSelect();
+      renderAll();
+
+      if (!supportsCustomDecks()) {
+        $("#addDeckBtn").disabled = true;
+        showToast("Este navegador no puede guardar barajas personalizadas.");
+      }
+    }
+
+    initApp();
   </script>
 </body>
 </html>
