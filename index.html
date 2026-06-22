@@ -327,6 +327,7 @@
       --side-card-size: 104px;
       --frame-size: 4px;
       --board-gap: 6px;
+      --cell-gap: 1px;
       --board-cells: 4;
       --board-ratio: 3 / 4;
       --sheet-bg: #101828;
@@ -470,12 +471,17 @@
       display: grid;
       grid-template-columns: repeat(var(--board-cells), minmax(0, 1fr));
       grid-template-rows: repeat(var(--board-cells), minmax(0, 1fr));
-      column-gap: 1px;
-      row-gap: 1px;
+      column-gap: var(--cell-gap);
+      row-gap: var(--cell-gap);
       aspect-ratio: var(--board-ratio);
       background: var(--board-frame-color);
       border: 5px solid var(--board-frame-color);
       min-width: 0;
+    }
+
+    body[data-card-shape="circle"] .board {
+      --cell-gap: 0px;
+      border-width: 3px;
     }
 
     .cell {
@@ -484,31 +490,11 @@
       min-height: 0;
     }
 
-    .cell.double::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      box-shadow: inset 0 0 0 3px var(--mark);
-    }
-
-    .cell.double { --mark: var(--teal); }
-
     body[data-card-shape="circle"] .cell {
       display: grid;
       place-items: center;
       background: transparent;
       overflow: visible;
-    }
-
-    body[data-card-shape="circle"] .cell.double::after {
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      inset: auto;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      border-radius: 50%;
     }
 
     .cell img,
@@ -659,11 +645,13 @@
     body[data-card-shape="circle"] .card-tile {
       aspect-ratio: 1 / 1;
       border-radius: 50%;
+      border-color: #000;
     }
 
     body[data-card-shape="circle"] .center-option:not(:first-child) {
       aspect-ratio: 1 / 1;
       border-radius: 50%;
+      border-color: #000;
     }
 
     body[data-card-shape="circle"] .cell img {
@@ -673,6 +661,7 @@
       border-radius: 50%;
       object-fit: fill;
       object-position: center;
+      box-shadow: 0 0 0 1px #000;
     }
 
     body[data-card-shape="circle"] .mini-card img {
@@ -697,8 +686,6 @@
     .card-tile:focus { outline: none; }
     .card-tile:focus-visible { outline: 3px solid #aeb8c9; outline-offset: 2px; }
 
-    .card-tile.is-double { outline: 4px solid var(--teal); outline-offset: -4px; }
-
     .card-tile img { object-fit: contain; }
 
     .toast {
@@ -706,6 +693,97 @@
       color: #b43333;
       font-size: .82rem;
       font-weight: 850;
+    }
+
+    .promo-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      min-height: 100svh;
+      padding: 24px;
+      display: grid;
+      place-items: center;
+      color: #ffffff;
+      background:
+        linear-gradient(135deg, rgba(16, 23, 36, .92), rgba(15, 143, 115, .84)),
+        url("Baraja Piolin/WhatsApp%20Image%202026-05-06%20at%2018.39.54%20(11).jpeg") center / cover;
+    }
+
+    .promo-screen.is-hidden {
+      display: none;
+    }
+
+    .promo-content {
+      width: min(880px, 100%);
+      display: grid;
+      gap: 22px;
+      text-align: center;
+      justify-items: center;
+    }
+
+    .promo-kicker {
+      margin: 0;
+      padding: 8px 14px;
+      border: 1px solid rgba(255, 255, 255, .3);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .14);
+      font-size: .82rem;
+      font-weight: 950;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .promo-content h1 {
+      margin: 0;
+      max-width: 760px;
+      font-size: clamp(2.3rem, 7vw, 5.8rem);
+      line-height: .92;
+      text-wrap: balance;
+    }
+
+    .promo-content p {
+      margin: 0;
+      max-width: 680px;
+      color: rgba(255, 255, 255, .9);
+      font-size: clamp(1rem, 2vw, 1.35rem);
+      line-height: 1.35;
+      font-weight: 750;
+    }
+
+    .promo-contact {
+      display: grid;
+      gap: 6px;
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      font-weight: 900;
+    }
+
+    .promo-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .promo-btn {
+      min-height: 48px;
+      border: 1px solid rgba(255, 255, 255, .32);
+      border-radius: 10px;
+      padding: 0 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: #101724;
+      background: #ffd84a;
+      box-shadow: 0 14px 34px rgba(0, 0, 0, .22);
+      font-weight: 950;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .promo-btn.secondary {
+      color: #ffffff;
+      background: rgba(255, 255, 255, .14);
     }
 
     @media (max-width: 1180px) {
@@ -733,7 +811,7 @@
 
     @media print {
       body { background: white; }
-      .toolbar, .deck-panel { display: none !important; }
+      .promo-screen, .toolbar, .deck-panel { display: none !important; }
       .app { width: 100%; min-height: 0; padding: 0; display: block; }
       .main { display: block; }
       .sheet-panel { box-shadow: none; border: 0; border-radius: 0; padding: 0; overflow: visible; }
@@ -748,6 +826,22 @@
   </style>
 </head>
 <body>
+  <section class="promo-screen" id="promoScreen" aria-label="Publicidad">
+    <div class="promo-content">
+      <p class="promo-kicker">Ricardo Puente desarrollador</p>
+      <h1>Generadores de tablas descargables a super precio</h1>
+      <p>Crea tus tablitas, personaliza barajas y descarga tus archivos listos para imprimir.</p>
+      <div class="promo-contact">
+        <span>Info +52 866 283 3833</span>
+        <span>Dudas por WhatsApp o Messenger</span>
+      </div>
+      <div class="promo-actions">
+        <button class="promo-btn" id="enterAppBtn" type="button">Entrar al generador</button>
+        <a class="promo-btn secondary" href="https://wa.me/528662833833?text=Hola%20Ricardo%2C%20quiero%20info%20de%20los%20generadores%20de%20tablas%20descargables" target="_blank" rel="noopener">WhatsApp</a>
+      </div>
+    </div>
+  </section>
+
   <main class="app">
     <section class="toolbar" aria-label="Controles">
       <label class="field" for="deckSelect">
@@ -765,6 +859,7 @@
         <select id="boardSize">
           <option value="4">4x4 cartas</option>
           <option value="5">5x5 figuritas</option>
+          <option value="cross">Cruzadas</option>
         </select>
       </label>
 
@@ -824,7 +919,7 @@
 
       <label class="field" for="batchPrefCount">
         <span>Prefs/20</span>
-        <input id="batchPrefCount" type="number" min="0" max="4" value="4">
+        <input id="batchPrefCount" type="number" min="0" max="7" value="7">
       </label>
 
       <button class="btn" id="clearBtn" type="button">Limpiar</button>
@@ -877,6 +972,10 @@
             Preferidas ubicacion aleatoria
           </label>
           <label class="toggle">
+            <input id="randomCenter" type="checkbox">
+            Centro aleatorio
+          </label>
+          <label class="toggle">
             <input id="forceAll" type="checkbox" checked>
             Repartir todo el mazo
           </label>
@@ -884,15 +983,11 @@
             <input id="doubleBoards" type="checkbox">
             Tablas dobles
           </label>
-          <label class="toggle">
-            <input id="randomDoubleCards" type="checkbox" checked>
-            Dobles aleatorios
-          </label>
         </div>
 
         <div class="status">
           <div>Centro: <strong id="centerStatus">Sin centro</strong></div>
-          <div>Preferidas: <strong id="prefStatus">0 de 4</strong></div>
+          <div>Preferidas: <strong id="prefStatus">0 de 7</strong></div>
           <div>Dobles: <strong id="doubleStatus">Aleatorios</strong></div>
           <div class="toast" id="toast"></div>
         </div>
@@ -980,23 +1075,25 @@
     const fileNameSorter = new Intl.Collator("es", { numeric: true, sensitivity: "base" });
 
     const CENTER_POS = 5;
+    const CENTER_WITH_DOUBLES_POS = 9;
     const DOUBLE_POSITIONS = [5, 6];
-    const PREF_POSITIONS_4X4 = [0, 3, 12, 15];
-    const PREF_POSITIONS_5X5 = [0, 4, 20, 24];
+    const MAX_PREFS = 7;
+    const PREF_POSITIONS_4X4 = [0, 3, 12, 15, 1, 2, 4];
+    const PREF_POSITIONS_5X5 = [0, 4, 20, 24, 2, 10, 14];
+    const PREF_POSITIONS_CROSS = [0, 3, 12, 15, 9, 10, 5];
+    const CROSS_POSITIONS = [0, 3, 5, 6, 9, 10, 12, 15];
 
     const state = {
       deck: "clasico",
       boardCount: 12,
-      boardSize: 4,
+      boardSize: "4",
       fourBoardLayout: "grid",
       center: null,
       prefs: [],
       repeatPrefs: false,
       randomPrefPositions: false,
+      randomCenter: false,
       doubleBoards: false,
-      randomDoubleCards: true,
-      doubleSelectMode: false,
-      doubleIds: [],
       forceAll: true,
       showCenterPanel: true,
       showPrefsPanel: true,
@@ -1004,11 +1101,15 @@
       boardFrameColor: "#000000",
       sideCardSize: 104,
       cardShape: "rectangle",
-      batchPrefCount: 4,
+      batchPrefCount: 7,
       boards: []
     };
 
     const $ = selector => document.querySelector(selector);
+
+    $("#enterAppBtn").addEventListener("click", () => {
+      $("#promoScreen").classList.add("is-hidden");
+    });
 
     function assetPath(...parts) {
       return parts.map(part => encodeURIComponent(part)).join("/");
@@ -1084,7 +1185,8 @@
     }
 
     function clampBoardSize(value) {
-      return Number(value) === 5 ? 5 : 4;
+      if (value === "cross") return "cross";
+      return Number(value) === 5 ? "5" : "4";
     }
 
     function clampFourBoardLayout(value) {
@@ -1092,19 +1194,58 @@
     }
 
     function clampBatchPrefCount(value) {
-      return Math.max(0, Math.min(4, Number(value) || 0));
+      return Math.max(0, Math.min(MAX_PREFS, Number(value) || 0));
     }
 
     function cardCount() {
-      return state.boardSize * state.boardSize;
+      return boardCellCount() * boardCellCount();
     }
 
     function usesClassicRules() {
-      return state.boardSize === 4;
+      return state.boardSize === "4";
+    }
+
+    function usesCrossRules() {
+      return state.boardSize === "cross";
+    }
+
+    function usesDoubleRules() {
+      return usesClassicRules() || usesCrossRules();
+    }
+
+    function boardCellCount() {
+      return usesClassicRules() || usesCrossRules() ? 4 : 5;
+    }
+
+    function fillPositions() {
+      return usesCrossRules()
+        ? CROSS_POSITIONS
+        : Array.from({ length: cardCount() }, (_, index) => index);
     }
 
     function prefPositions() {
+      if (usesCrossRules()) return PREF_POSITIONS_CROSS;
       return usesClassicRules() ? PREF_POSITIONS_4X4 : PREF_POSITIONS_5X5;
+    }
+
+    function boardTypeLabel() {
+      if (usesClassicRules()) return "4x4";
+      if (usesCrossRules()) return "cruzadas";
+      return "5x5";
+    }
+
+    function boardAspectRatio() {
+      if (state.cardShape === "circle") return "1 / 1.08";
+      return "3 / 4";
+    }
+
+    function boardLayoutSize() {
+      if (state.cardShape === "circle") {
+        if (usesClassicRules() || usesCrossRules()) return { width: 240, height: 259 };
+        return { width: 300, height: 324 };
+      }
+      if (usesClassicRules() || usesCrossRules()) return { width: 240, height: 320 };
+      return { width: 300, height: 400 };
     }
 
     function boardGrid() {
@@ -1170,6 +1311,17 @@
     }
 
     function runtimeCustomDeck(record) {
+      if (record.urls) {
+        return {
+          id: record.id,
+          label: record.label,
+          type: "custom",
+          custom: true,
+          desktop: Boolean(record.desktop),
+          urls: record.urls
+        };
+      }
+
       const urls = record.files.map(file => URL.createObjectURL(file.blob));
       return {
         id: record.id,
@@ -1186,6 +1338,14 @@
     }
 
     async function loadCustomDecks() {
+      if (window.pozitoDecks?.loadCustomDecks) {
+        const records = await window.pozitoDecks.loadCustomDecks();
+        records
+          .sort((a, b) => fileNameSorter.compare(a.label, b.label))
+          .forEach(record => CUSTOM_DECKS.push(runtimeCustomDeck(record)));
+        return;
+      }
+
       if (!supportsCustomDecks()) return;
       const records = await customDeckTransaction("readonly", store => dbRequest(store.getAll()));
       records
@@ -1198,20 +1358,66 @@
     }
 
     async function deleteCustomDeckRecord(id) {
+      if (window.pozitoDecks?.deleteCustomDeck) {
+        await window.pozitoDecks.deleteCustomDeck(id);
+        return;
+      }
+
       await customDeckTransaction("readwrite", store => store.delete(id));
     }
 
-    function folderNameFromFiles(files) {
-      const relativePath = files[0]?.webkitRelativePath || "";
-      return relativePath.split("/")[0] || "Baraja nueva";
+    async function importCustomDeckFromDesktop() {
+      if (!window.pozitoDecks?.importCustomDeck) return false;
+
+      showToast("Selecciona la carpeta de la baraja...");
+      const result = await window.pozitoDecks.importCustomDeck();
+      if (result?.canceled) {
+        showToast("");
+        return true;
+      }
+      if (result?.error) {
+        showToast(result.error);
+        return true;
+      }
+      if (!result?.deck) {
+        showToast("No se pudo guardar esa baraja.");
+        return true;
+      }
+
+      const deck = runtimeCustomDeck(result.deck);
+      CUSTOM_DECKS.push(deck);
+      CUSTOM_DECKS.sort((a, b) => fileNameSorter.compare(a.label, b.label));
+      state.deck = deck.id;
+      renderDeckSelect();
+      renderAll();
+      showToast(`Baraja "${deck.label}" guardada con 54 cartas.`);
+      return true;
+    }
+
+    function normalizeCustomDeckFile(file) {
+      if (file instanceof Blob) return file;
+
+      const data = file.data?.data ? new Uint8Array(file.data.data) : file.data;
+      const blob = new Blob([data], { type: file.type || "image/jpeg" });
+      Object.defineProperties(blob, {
+        name: { value: file.name || "imagen.jpg" },
+        webkitRelativePath: { value: file.relativePath || file.name || "imagen.jpg" }
+      });
+      return blob;
+    }
+
+    function folderNameFromFiles(files, fallbackName = "") {
+      const relativePath = files[0]?.webkitRelativePath || files[0]?.relativePath || "";
+      return fallbackName || relativePath.split("/")[0] || "Baraja nueva";
     }
 
     function imageFilesFromSelection(fileList) {
       return Array.from(fileList)
+        .map(normalizeCustomDeckFile)
         .filter(file => file.type.startsWith("image/") || IMAGE_FILE_PATTERN.test(file.name))
         .sort((a, b) => {
-          const pathA = a.webkitRelativePath || a.name;
-          const pathB = b.webkitRelativePath || b.name;
+          const pathA = a.webkitRelativePath || a.relativePath || a.name;
+          const pathB = b.webkitRelativePath || b.relativePath || b.name;
           return fileNameSorter.compare(pathA, pathB);
         });
     }
@@ -1234,7 +1440,7 @@
       }
     }
 
-    async function addCustomDeckFromFiles(fileList) {
+    async function addCustomDeckFromFiles(fileList, fallbackFolderName = "") {
       if (!supportsCustomDecks()) {
         showToast("Esta opcion necesita un navegador moderno para guardar barajas.");
         return;
@@ -1246,7 +1452,7 @@
         return;
       }
 
-      const folderName = folderNameFromFiles(imageFiles);
+      const folderName = folderNameFromFiles(imageFiles, fallbackFolderName);
       const label = (window.prompt("Nombre de la baraja:", folderName) || "").trim();
       if (!label) return;
 
@@ -1325,62 +1531,43 @@
     function sanitizeState() {
       state.boardSize = clampBoardSize(state.boardSize);
       state.fourBoardLayout = clampFourBoardLayout(state.fourBoardLayout);
-      state.prefs = uniqueValidIds(state.prefs).slice(0, 4);
-      state.doubleIds = uniqueValidIds(state.doubleIds);
+      state.prefs = uniqueValidIds(state.prefs).slice(0, MAX_PREFS);
 
       if (!usesClassicRules()) {
         state.center = null;
-        state.doubleIds = [];
+        state.randomCenter = false;
+      }
+
+      if (!usesDoubleRules()) {
         state.doubleBoards = false;
-        state.doubleSelectMode = false;
-        state.showCenterPanel = false;
       }
 
       if (state.doubleBoards) {
-        state.center = null;
-        state.showCenterPanel = false;
-      } else {
-        state.doubleSelectMode = false;
-      }
-
-      if (state.randomDoubleCards) {
-        state.doubleSelectMode = false;
+        if (state.center) state.showCenterPanel = true;
       }
 
       if (state.center) {
         state.showCenterPanel = true;
         state.prefs = state.prefs.filter(id => id !== state.center);
-        state.doubleIds = state.doubleIds.filter(id => id !== state.center);
       }
-
-      state.prefs = state.prefs.filter(id => !state.doubleIds.includes(id));
     }
 
     function randomOpenPosition(slots, blocked = new Set()) {
       const positions = [];
-      for (let pos = 0; pos < cardCount(); pos++) {
+      fillPositions().forEach(pos => {
         if (!slots[pos] && !blocked.has(pos)) positions.push(pos);
-      }
+      });
       return positions[Math.floor(Math.random() * positions.length)];
     }
 
     function doubleIdsForBoards(ids, random) {
-      if (!usesClassicRules() || !state.doubleBoards) return [];
+      if (!usesDoubleRules() || !state.doubleBoards) return [];
 
-      const preferredIds = new Set(state.prefs);
-      const usableIds = ids.filter(id => !preferredIds.has(id));
+      const blockedIds = new Set(state.prefs);
+      if (state.center) blockedIds.add(state.center);
+      const usableIds = ids.filter(id => !blockedIds.has(id));
       const fallbackIds = usableIds.length ? usableIds : ids;
-
-      if (state.randomDoubleCards) {
-        return shuffle(fallbackIds, random).slice(0, state.boardCount);
-      }
-
-      if (!state.doubleIds.length) return [];
-
-      const selected = state.doubleIds.filter(id => fallbackIds.includes(id));
-      const selectedSet = new Set(selected);
-      const fill = shuffle(fallbackIds.filter(id => !selectedSet.has(id)), random);
-      return [...selected, ...fill].slice(0, state.boardCount);
+      return shuffle(fallbackIds, random).slice(0, state.boardCount);
     }
 
     function preferredPlacementsForBoard(boardIndex) {
@@ -1393,7 +1580,7 @@
         }));
       }
 
-      const groupPosition = boardIndex % 4;
+      const groupPosition = boardIndex % MAX_PREFS;
       if (groupPosition >= state.prefs.length) return [];
       return [{
         id: state.prefs[groupPosition],
@@ -1411,7 +1598,7 @@
       const boardData = [];
 
       const placeCard = (slots, used, id, pos, allowDuplicate = false) => {
-        if (!id || slots[pos] || (!allowDuplicate && used.has(id))) return false;
+        if (!id || !Number.isInteger(pos) || slots[pos] || (!allowDuplicate && used.has(id))) return false;
         slots[pos] = id;
         used.add(id);
         globalCounts.set(id, globalCounts.get(id) + 1);
@@ -1447,6 +1634,7 @@
           DOUBLE_POSITIONS.forEach((pos, index) => {
             placeCard(slots, used, doubleId, pos, index > 0);
           });
+          placeCard(slots, used, state.center, CENTER_WITH_DOUBLES_POS);
         } else if (state.center) {
           placeCard(slots, used, state.center, CENTER_POS);
         }
@@ -1454,21 +1642,25 @@
         preferredPlacements.forEach(({ id, pos }) => {
           if (id === state.center || id === doubleId) return;
           const targetPos = state.randomPrefPositions
-            ? randomOpenPosition(slots, usesClassicRules() ? new Set(DOUBLE_POSITIONS) : new Set())
+            ? randomOpenPosition(slots, usesDoubleRules() ? new Set(DOUBLE_POSITIONS) : new Set())
             : pos;
-          placeCard(slots, used, id, targetPos);
+          const placed = placeCard(slots, used, id, targetPos);
+          if (!placed && !state.randomPrefPositions) {
+            const fallbackPos = randomOpenPosition(slots, usesDoubleRules() ? new Set(DOUBLE_POSITIONS) : new Set());
+            placeCard(slots, used, id, fallbackPos);
+          }
         });
 
         boardData.push({ slots, used });
       }
 
       boardData.forEach(({ slots, used }) => {
-        for (let pos = 0; pos < cardCount(); pos++) {
-          if (slots[pos]) continue;
-
-          const card = balancedCard(slots, used);
-          placeCard(slots, used, card, pos);
-        }
+        fillPositions().forEach(pos => {
+          if (!slots[pos]) {
+            const card = balancedCard(slots, used);
+            placeCard(slots, used, card, pos);
+          }
+        });
       });
 
       state.boards = boardData.map(({ slots }) => slots);
@@ -1499,13 +1691,11 @@
 
     function renderCards() {
       const prefSet = new Set(state.prefs);
-      const doubleSet = new Set(state.doubleIds);
       $("#cards").innerHTML = FIGURAS.map(fig => {
         const classes = [
           "card-tile",
           state.center === fig.id ? "is-center" : "",
-          prefSet.has(fig.id) ? "is-pref" : "",
-          doubleSet.has(fig.id) ? "is-double" : ""
+          prefSet.has(fig.id) ? "is-pref" : ""
         ].filter(Boolean).join(" ");
         return `
           <button class="${classes}" type="button" data-card="${fig.id}" aria-label="${safeText(fig.n)}">
@@ -1517,7 +1707,7 @@
       document.querySelectorAll("[data-card]").forEach(button => {
         button.addEventListener("click", () => {
           const id = Number(button.dataset.card);
-          state.doubleSelectMode ? toggleDoubleCard(id) : togglePreferred(id);
+          togglePreferred(id);
         });
       });
     }
@@ -1552,17 +1742,14 @@
 
     function selectCenter(value) {
       if (!usesClassicRules()) {
-        showToast("Centro no aplica en tablas 5x5.");
+        showToast(`Centro no aplica en tablas ${boardTypeLabel()}.`);
         return;
       }
       state.center = value ? Number(value) : null;
       if (state.center) {
-        state.doubleBoards = false;
-        state.doubleSelectMode = false;
         state.showCenterPanel = true;
       }
       state.prefs = state.prefs.filter(id => id !== state.center);
-      state.doubleIds = state.doubleIds.filter(id => id !== state.center);
       setCenterPickerOpen(false);
       renderAll();
     }
@@ -1589,10 +1776,10 @@
       $("#showPrefsPanel").checked = state.showPrefsPanel;
       $("#repeatPrefs").checked = state.repeatPrefs;
       $("#randomPrefPositions").checked = state.randomPrefPositions;
+      $("#randomCenter").checked = state.randomCenter;
+      $("#randomCenter").disabled = !usesClassicRules();
       $("#doubleBoards").checked = state.doubleBoards;
-      $("#doubleBoards").disabled = !usesClassicRules();
-      $("#randomDoubleCards").checked = state.randomDoubleCards;
-      $("#randomDoubleCards").disabled = !usesClassicRules();
+      $("#doubleBoards").disabled = !usesDoubleRules();
       $("#centerSelect").disabled = !usesClassicRules();
       $("#centerTrigger").disabled = !usesClassicRules();
       document.body.dataset.cardShape = state.cardShape;
@@ -1855,13 +2042,13 @@
           const slots = state.boards[boardIndex];
 
           [...board.children].forEach((cell, pos) => {
-            const id = slots[pos];
-            const img = images.get(id);
-            const rect = pixelRect(cell, sheetRect);
-            const isDouble = usesClassicRules() && state.doubleBoards && DOUBLE_POSITIONS.includes(pos) && slots[DOUBLE_POSITIONS[0]] === slots[DOUBLE_POSITIONS[1]];
-            if (!img) return;
+          const id = slots[pos];
+          const img = images.get(id);
+          const rect = pixelRect(cell, sheetRect);
+          const isDouble = usesDoubleRules() && state.doubleBoards && DOUBLE_POSITIONS.includes(pos) && slots[DOUBLE_POSITIONS[0]] === slots[DOUBLE_POSITIONS[1]];
 
-            if (state.cardShape === "circle") {
+          if (state.cardShape === "circle") {
+              if (!img) return;
               const size = Math.min(rect.w, rect.h);
               const x = rect.x + (rect.w - size) / 2;
               const y = rect.y + (rect.h - size) / 2;
@@ -1871,27 +2058,21 @@
               context.clip();
               drawImageFill(context, img, x, y, size, size);
               context.restore();
-              if (isDouble) {
-                context.lineWidth = 4;
-                context.strokeStyle = "#0f9f9a";
-                context.beginPath();
-                context.arc(x + size / 2, y + size / 2, size / 2 - 2, 0, Math.PI * 2);
-                context.stroke();
-              }
+              context.lineWidth = 1;
+              context.strokeStyle = "#000000";
+              context.beginPath();
+              context.arc(x + size / 2, y + size / 2, size / 2 - .5, 0, Math.PI * 2);
+              context.stroke();
             } else {
               context.fillStyle = transparentCards ? state.sheetColor : "#ffffff";
               context.fillRect(rect.x, rect.y, rect.w, rect.h);
+              if (!img) return;
               context.save();
               context.beginPath();
               context.rect(rect.x, rect.y, rect.w, rect.h);
               context.clip();
               drawImageFill(context, img, rect.x, rect.y, rect.w, rect.h);
               context.restore();
-              if (isDouble) {
-                context.lineWidth = 4;
-                context.strokeStyle = "#0f9f9a";
-                context.strokeRect(rect.x + 2, rect.y + 2, rect.w - 4, rect.h - 4);
-              }
             }
           });
         });
@@ -1948,7 +2129,6 @@
       return {
         ...state,
         prefs: [...state.prefs],
-        doubleIds: [...state.doubleIds],
         boards: state.boards.map(slots => [...slots])
       };
     }
@@ -1957,7 +2137,6 @@
       Object.assign(state, {
         ...snapshot,
         prefs: [...snapshot.prefs],
-        doubleIds: [...snapshot.doubleIds],
         boards: snapshot.boards.map(slots => [...slots])
       });
     }
@@ -1992,7 +2171,6 @@
       const ids = FIGURAS.map(fig => fig.id);
       const prefCounts = countMap(ids);
       const centerCounts = countMap(ids);
-      const doubleCounts = countMap(ids);
       let directoryHandle = null;
 
       button.disabled = true;
@@ -2006,42 +2184,44 @@
           if (original.doubleBoards) {
             const prefCount = original.showPrefsPanel ? clampBatchPrefCount(original.batchPrefCount) : 0;
             const fixedPrefs = original.prefs.slice(0, prefCount);
+            const batchCenter = original.showCenterPanel
+              ? (original.randomCenter
+                ? leastUsedIds(1, centerCounts, new Set(fixedPrefs), state.boardCount)[0] || null
+                : original.center)
+              : null;
             const randomPrefs = leastUsedIds(
               Math.max(0, prefCount - fixedPrefs.length),
               prefCounts,
-              new Set(fixedPrefs),
+              new Set([...fixedPrefs, batchCenter].filter(Boolean)),
               state.boardCount
             );
             state.doubleBoards = true;
-            state.randomDoubleCards = false;
-            state.doubleSelectMode = false;
-            state.center = null;
+            state.center = batchCenter;
             state.prefs = [...fixedPrefs, ...randomPrefs];
             state.repeatPrefs = prefCount > 0;
-            state.showCenterPanel = false;
+            state.showCenterPanel = original.showCenterPanel && Boolean(batchCenter);
             state.showPrefsPanel = original.showPrefsPanel && prefCount > 0;
-            state.doubleIds = leastUsedIds(state.boardCount, doubleCounts, new Set(state.prefs));
           } else {
             const prefCount = original.showPrefsPanel ? clampBatchPrefCount(original.batchPrefCount) : 0;
             const useCenter = Boolean(original.showCenterPanel);
             state.doubleBoards = false;
-            state.randomDoubleCards = true;
-            state.doubleSelectMode = false;
-            state.doubleIds = [];
             state.repeatPrefs = prefCount > 0;
             state.showPrefsPanel = original.showPrefsPanel && prefCount > 0;
             state.showCenterPanel = useCenter;
             const fixedPrefs = original.prefs.slice(0, prefCount);
+            const batchCenter = useCenter
+              ? (original.randomCenter
+                ? leastUsedIds(1, centerCounts, new Set(fixedPrefs), state.boardCount)[0] || null
+                : original.center)
+              : null;
             const randomPrefs = leastUsedIds(
               Math.max(0, prefCount - fixedPrefs.length),
               prefCounts,
-              new Set(fixedPrefs),
+              new Set([...fixedPrefs, batchCenter].filter(Boolean)),
               state.boardCount
             );
             state.prefs = [...fixedPrefs, ...randomPrefs];
-            state.center = useCenter
-              ? leastUsedIds(1, centerCounts, new Set(state.prefs), state.boardCount)[0] || null
-              : null;
+            state.center = batchCenter;
           }
 
           renderAll();
@@ -2077,21 +2257,20 @@
     function renderSheet() {
       const { cols, rows } = boardGrid();
       const frameSize = 4;
-      const boardGap = 6;
+      const boardGap = state.cardShape === "circle" ? 3 : 6;
       const showSide = state.showCenterPanel || state.showPrefsPanel;
-      const boardCells = state.boardSize;
+      const boardCells = boardCellCount();
       $("#sheet").style.setProperty("--cols", cols);
       $("#sheet").style.setProperty("--rows", rows);
       $("#sheet").style.setProperty("--board-cells", boardCells);
-      $("#sheet").style.setProperty("--board-ratio", usesClassicRules() ? "3 / 4" : "1 / 1");
+      $("#sheet").style.setProperty("--board-ratio", boardAspectRatio());
       $("#sheet").style.setProperty("--board-gap", `${boardGap}px`);
       $("#sheet").style.setProperty("--frame-size", `${frameSize}px`);
       applyTheme();
       $("#sheet").classList.toggle("no-side", !showSide);
       const sideWidth = sidePanelWidth(showSide);
       const sideGap = showSide ? frameSize : 0;
-      const boardWidth = usesClassicRules() ? 240 : 280;
-      const boardHeight = usesClassicRules() ? 320 : 280;
+      const { width: boardWidth, height: boardHeight } = boardLayoutSize();
       const sheetWidth = frameSize * 2 + sideWidth + sideGap + cols * boardWidth + (cols - 1) * boardGap;
       const sheetHeight = frameSize * 2 + rows * boardHeight + (rows - 1) * boardGap;
       $("#sheet").style.setProperty("--side-width", `${sideWidth}px`);
@@ -2101,9 +2280,7 @@
       $("#sidePanel").classList.toggle("hide-prefs", !state.showPrefsPanel);
       $("#centerBox").hidden = !state.showCenterPanel;
       $("#prefsBox").hidden = !state.showPrefsPanel;
-      const centerMini = state.doubleBoards
-        ? `<div id="centerMini" class="mini-card center-mark">Dobles</div>`
-        : renderMiniCard(state.center, "center-mark", "Sin centro").replace("<div", "<div id=\"centerMini\"");
+      const centerMini = renderMiniCard(state.center, "center-mark", "Sin centro").replace("<div", "<div id=\"centerMini\"");
       $("#centerMini").outerHTML = centerMini;
       $("#prefMini").innerHTML = state.prefs.length
         ? state.prefs.map(id => renderMiniCard(id, "pref-mark", "")).join("")
@@ -2113,14 +2290,14 @@
       $("#boards").innerHTML = state.boards.map((slots, boardIndex) => {
         const preferredIds = new Set((preferredPlacementsForBoard(boardIndex) || []).map(item => item.id));
         const cells = slots.map((id, pos) => {
-          const isDouble = usesClassicRules() && state.doubleBoards && DOUBLE_POSITIONS.includes(pos) && slots[DOUBLE_POSITIONS[0]] === slots[DOUBLE_POSITIONS[1]];
+          const isDouble = usesDoubleRules() && state.doubleBoards && DOUBLE_POSITIONS.includes(pos) && slots[DOUBLE_POSITIONS[0]] === slots[DOUBLE_POSITIONS[1]];
           const classes = [
             "cell",
-            usesClassicRules() && state.center && pos === CENTER_POS && id === state.center ? "center" : "",
+            usesClassicRules() && state.center && pos === (state.doubleBoards ? CENTER_WITH_DOUBLES_POS : CENTER_POS) && id === state.center ? "center" : "",
             preferredIds.has(id) ? "preferred" : "",
             isDouble ? "double" : ""
           ].filter(Boolean).join(" ");
-          return `<div class="${classes}">${imageHTML(id)}</div>`;
+          return `<div class="${classes}">${id ? imageHTML(id) : ""}</div>`;
         }).join("");
         return `<div class="board" aria-label="Tabla ${boardIndex + 1}">${cells}</div>`;
       }).join("");
@@ -2129,14 +2306,11 @@
 
     function renderStatus() {
       const center = !usesClassicRules()
-        ? "No aplica en 5x5"
-        : (state.doubleBoards ? "Usando tablas dobles" : (state.center ? fallbackText(state.center) : "Sin centro"));
-      const doubleStatus = state.randomDoubleCards
-        ? "Aleatorios"
-        : `${state.doubleIds.length} seleccionada${state.doubleIds.length === 1 ? "" : "s"}`;
+        ? `No aplica en ${boardTypeLabel()}`
+        : (state.randomCenter ? "Aleatorio en 20 PNGs" : (state.center ? fallbackText(state.center) : "Sin centro"));
       $("#centerStatus").textContent = center;
-      $("#prefStatus").textContent = `${state.prefs.length} de 4${state.repeatPrefs ? ", en todas" : ", por bloque"}${state.randomPrefPositions ? ", aleatorias" : ""}`;
-      $("#doubleStatus").textContent = !usesClassicRules() ? "No aplican en 5x5" : (state.doubleBoards ? doubleStatus : "Apagadas");
+      $("#prefStatus").textContent = `${state.prefs.length} de ${MAX_PREFS}${state.repeatPrefs ? ", en todas" : ", por bloque"}${state.randomPrefPositions ? ", aleatorias" : ""}`;
+      $("#doubleStatus").textContent = !usesDoubleRules() ? `No aplican en ${boardTypeLabel()}` : (state.doubleBoards ? "Aleatorios" : "Apagadas");
       $("#boardCount").value = state.boardCount;
       $("#boardSize").value = state.boardSize;
       $("#fourBoardLayout").value = state.fourBoardLayout;
@@ -2155,38 +2329,16 @@
       renderSheet();
     }
 
-    function toggleDoubleCard(id) {
-      if (!usesClassicRules()) {
-        showToast("Dobles no aplica en tablas 5x5.");
-        return;
-      }
-      if (state.doubleIds.includes(id)) {
-        state.doubleIds = state.doubleIds.filter(doubleId => doubleId !== id);
-      } else {
-        state.doubleIds.push(id);
-      }
-
-      state.doubleBoards = true;
-      state.randomDoubleCards = false;
-      state.center = null;
-      state.prefs = state.prefs.filter(pref => pref !== id);
-      renderAll();
-    }
-
     function togglePreferred(id) {
       if (state.center === id) {
         showToast("Esa carta ya esta en el centro. Quita el centro o elige otra preferida.");
         return;
       }
-      if (state.doubleIds.includes(id)) {
-        showToast("Esa carta ya esta en dobles. Quitala de dobles para usarla como preferida.");
-        return;
-      }
 
       if (state.prefs.includes(id)) {
         state.prefs = state.prefs.filter(pref => pref !== id);
-      } else if (state.prefs.length >= 4) {
-        showToast("Maximo 4 preferidas. Quita una para agregar otra.");
+      } else if (state.prefs.length >= MAX_PREFS) {
+        showToast(`Maximo ${MAX_PREFS} preferidas. Quita una para agregar otra.`);
         return;
       } else {
         state.prefs.push(id);
@@ -2200,7 +2352,15 @@
       renderAll();
     });
 
-    $("#addDeckBtn").addEventListener("click", () => {
+    $("#addDeckBtn").addEventListener("click", async () => {
+      try {
+        if (await importCustomDeckFromDesktop()) return;
+      } catch (error) {
+        console.error(error);
+        showToast("No se pudo guardar esa baraja. Prueba con una carpeta normal en el Escritorio.");
+        if (window.pozitoDecks?.importCustomDeck) return;
+      }
+
       $("#deckFolderInput").value = "";
       $("#deckFolderInput").click();
     });
@@ -2232,10 +2392,9 @@
       state.boardSize = clampBoardSize(event.target.value);
       if (!usesClassicRules()) {
         state.center = null;
-        state.doubleIds = [];
+      }
+      if (!usesDoubleRules()) {
         state.doubleBoards = false;
-        state.doubleSelectMode = false;
-        state.showCenterPanel = false;
       }
       renderAll();
     });
@@ -2256,7 +2415,7 @@
 
     $("#centerTrigger").addEventListener("click", () => {
       if (!usesClassicRules()) {
-        showToast("Centro no aplica en tablas 5x5.");
+        showToast(`Centro no aplica en tablas ${boardTypeLabel()}.`);
         return;
       }
       const isOpen = $("#centerPicker").hasAttribute("open");
@@ -2298,10 +2457,7 @@
         return;
       }
       state.showCenterPanel = event.target.checked;
-      if (state.showCenterPanel && state.doubleBoards) {
-        state.doubleBoards = false;
-        state.doubleSelectMode = false;
-      }
+      if (!state.showCenterPanel) state.randomCenter = false;
       renderSheet();
     });
 
@@ -2320,56 +2476,38 @@
       renderAll();
     });
 
+    $("#randomCenter").addEventListener("change", event => {
+      if (!usesClassicRules()) {
+        state.randomCenter = false;
+        renderAll();
+        return;
+      }
+      state.randomCenter = event.target.checked;
+      if (state.randomCenter) state.showCenterPanel = true;
+      renderAll();
+    });
+
     $("#forceAll").addEventListener("change", event => {
       state.forceAll = event.target.checked;
       renderAll();
     });
 
     $("#doubleBoards").addEventListener("change", event => {
-      if (!usesClassicRules()) {
+      if (!usesDoubleRules()) {
         state.doubleBoards = false;
-        state.doubleSelectMode = false;
         renderAll();
         return;
       }
       state.doubleBoards = event.target.checked;
       if (state.doubleBoards) {
-        state.center = null;
-        state.showCenterPanel = false;
-      } else {
-        state.doubleSelectMode = false;
+        if (state.center) state.showCenterPanel = true;
       }
       renderAll();
-    });
-
-    $("#randomDoubleCards").addEventListener("change", event => {
-      if (!usesClassicRules()) {
-        state.randomDoubleCards = event.target.checked;
-        state.doubleIds = [];
-        state.doubleBoards = false;
-        state.doubleSelectMode = false;
-        renderAll();
-        showToast("Dobles no aplica en tablas 5x5.");
-        return;
-      }
-      state.randomDoubleCards = event.target.checked;
-      state.doubleBoards = true;
-      state.center = null;
-      state.showCenterPanel = false;
-      state.doubleSelectMode = !state.randomDoubleCards;
-      $("#deckPanel").open = true;
-      renderAll();
-      if (!state.randomDoubleCards) {
-        $("#cards").scrollIntoView({ block: "nearest" });
-        showToast("Modo manual activo: da click en las cartas que quieres usar como dobles.");
-      }
     });
 
     $("#clearBtn").addEventListener("click", () => {
       state.center = null;
       state.prefs = [];
-      state.doubleIds = [];
-      state.doubleSelectMode = false;
       renderCenterSelect();
       renderAll();
     });

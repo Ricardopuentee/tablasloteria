@@ -1,0 +1,18 @@
+INSTRUCCIONES PARA ABRIR TABLITAS DE POZITO
+
+1. Descarga el archivo:
+   Tablitas-de-Pozito-Portable-1.0.4.exe
+
+2. Dale doble click al archivo descargado.
+
+3. Si Windows muestra una advertencia de seguridad, elige:
+   Mas informacion > Ejecutar de todas formas
+
+4. Espera unos segundos a que abra la app.
+
+NOTA:
+No necesitas instalar nada. Este archivo abre la app directamente.
+
+PARA BARAJAS SIN FONDO:
+Usa imagenes PNG con transparencia y pon "sin fondo" en el nombre de la carpeta,
+por ejemplo: "Princesas sin fondo" o "Baraja animales sin fondo".

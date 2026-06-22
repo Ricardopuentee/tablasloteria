@@ -1,0 +1,55 @@
+{
+  "name": "tablas-de-pozito",
+  "version": "1.0.5",
+  "description": "Generador de tablitas de Pozito",
+  "main": "main.js",
+  "author": "Pozito",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win --x64"
+  },
+  "build": {
+    "appId": "com.pozito.tablitas",
+    "productName": "Tablitas de Pozito",
+    "asar": true,
+    "files": [
+      "index.html",
+      "main.js",
+      "preload.js",
+      "*.png",
+      "*.jpg",
+      "*.jpeg",
+      "*.webp",
+      "*.gif",
+      "*/**/*",
+      "!dist/**",
+      "!node_modules/**",
+      "!package-lock.json"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "artifactName": "Tablitas-de-Pozito-${version}.${ext}"
+    },
+    "portable": {
+      "artifactName": "Tablitas-de-Pozito-Portable-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Tablitas de Pozito"
+    }
+  },
+  "devDependencies": {
+    "electron": "^30.5.1",
+    "electron-builder": "^24.13.3"
+  }
+}
